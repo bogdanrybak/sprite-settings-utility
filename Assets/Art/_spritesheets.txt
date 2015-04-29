@@ -1,0 +1,2 @@
+ultimate_powerup.png,86,86,15
+basic_attack.png,30,34,3

@@ -6,15 +6,15 @@ namespace Staple.EditorScripts
 {
     public class SpriteSettingsWindow : EditorWindow
     {
-        const string SettingsPath = "Assets/Editor/SpriteSettingsUtility/DefaultSpriteSettings.asset";
+        const string SettingsPath = "Assets/Editor/QuickSpriteSettings/DefaultSpriteSettings.asset";
 
-        [MenuItem("Assets/Apply Sprite Settings")]
+        [MenuItem("Assets/Quick Sprite Settings")]
         public static void Init()
         {
             EditorWindow.GetWindow<SpriteSettingsWindow>("Sprite Settings", true);
         }
 
-        [MenuItem("Assets/Apply Sprite Settings", true)]
+        [MenuItem("Assets/Quick Sprite Settings", true)]
         public static bool TextureSelected()
         {
             foreach (var obj in Selection.objects)
@@ -82,7 +82,6 @@ namespace Staple.EditorScripts
                 EditorGUILayout.Space();
             }
 
-            DrawApplyButton();
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
         }
@@ -125,7 +124,10 @@ namespace Staple.EditorScripts
                 foreach (var name in UnityEditor.Sprites.Packer.atlasNames)
                 {
                     if (GUILayout.Button(name, EditorStyles.miniButton))
+                    {
                         config.Settings.PackingTag = name;
+                        EditorGUI.FocusTextInControl(name);
+                    }
                 }
             }
             

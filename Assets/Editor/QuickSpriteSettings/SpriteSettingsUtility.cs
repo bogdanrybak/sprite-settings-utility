@@ -51,7 +51,7 @@ namespace Staple.EditorScripts
 
                     for (var i = 0; i < spriteSheet.Length; i++)
                     {
-                        bool changed = changePivot && (importer.spritesheet == null || i < importer.spritesheet.Length);
+                        bool changed = changePivot || !(importer.spritesheet != null && i < importer.spritesheet.Length);
                         spriteSheet[i] = new SpriteMetaData
                         {
                             alignment = changed ? (int)prefs.SpriteAlignment : spriteSheet[i].alignment,

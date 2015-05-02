@@ -17,14 +17,14 @@ namespace Staple.EditorScripts
         public SpriteAlignment SpriteAlignment;
         public Vector2 CustomPivot;
 
-        public SpriteMeshType SpriteMeshType;
+        public SpriteMeshType SpriteMeshType = SpriteMeshType.Tight;
         [Range(0, 32)]
         public uint SpriteExtrude = 1;
 
-        public bool GenerateMipMaps;
-        public FilterMode FilterMode;
-        public TextureWrapMode WrapMode;
-        public TextureImporterFormat TextureFormat = TextureImporterFormat.AutomaticTruecolor;
+        public bool GenerateMipMaps = true;
+        public FilterMode FilterMode = FilterMode.Bilinear;
+        public TextureWrapMode WrapMode = TextureWrapMode.Clamp;
+        public TextureImporterFormat TextureFormat = TextureImporterFormat.AutomaticCompressed;
         public int MaxSize = 2048;
 
         /// <summary>

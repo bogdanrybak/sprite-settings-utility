@@ -14,12 +14,11 @@ namespace Staple.EditorScripts
 
         public int PixelsPerUnit = 100;
         public string PackingTag = "";
-        public SpriteAlignment SpriteAlignment;
+        public SpriteAlignment Pivot;
         public Vector2 CustomPivot;
 
         public SpriteMeshType SpriteMeshType = SpriteMeshType.Tight;
-        [Range(0, 32)]
-        public uint SpriteExtrude = 1;
+        public int ExtrudeEdges = 1;
 
         public bool GenerateMipMaps = true;
         public FilterMode FilterMode = FilterMode.Bilinear;
@@ -61,6 +60,10 @@ namespace Staple.EditorScripts
                 pos = new Rect(pos.x, pos.y + height + 2f, pos.width, lineHeight);
                 if (p.name == "MaxSize")
                     EditorGUI.IntPopup(pos, p, maxSizes.Select(x => new GUIContent(x.ToString())).ToArray(), maxSizes);
+                else if (p.name == "ExtrudeEdges")
+                {
+                    EditorGUI.IntSlider(pos, p, 0, 32, "Extrude Edges");
+                }
                 else
                 {
                     EditorGUI.PropertyField(pos, p);

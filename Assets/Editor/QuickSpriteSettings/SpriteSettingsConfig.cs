@@ -16,7 +16,7 @@ namespace Staple.EditorScripts
 
         void OnEnable()
         {
-            hideFlags = HideFlags.DontSaveInBuild;
+            //hideFlags = HideFlags.DontSaveInBuild;
 
             SettingsSets = SettingsSets ?? new List<SpriteSettings>();
             if (SettingsSets.Count < 1)

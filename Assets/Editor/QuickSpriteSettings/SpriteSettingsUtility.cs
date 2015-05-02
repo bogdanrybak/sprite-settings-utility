@@ -54,7 +54,7 @@ namespace Staple.EditorScripts
                         bool changed = changePivot || !(importer.spritesheet != null && i < importer.spritesheet.Length);
                         spriteSheet[i] = new SpriteMetaData
                         {
-                            alignment = changed ? (int)prefs.SpriteAlignment : spriteSheet[i].alignment,
+                            alignment = changed ? (int)prefs.Pivot : spriteSheet[i].alignment,
                             pivot = changed ? prefs.CustomPivot : spriteSheet[i].pivot,
                             name = fileName + "_" + Array.IndexOf(gridRects, gridRects[i]),
                             rect = gridRects[i]
@@ -84,13 +84,13 @@ namespace Staple.EditorScripts
 
                 settings.spritePixelsPerUnit = prefs.PixelsPerUnit;
 
-                settings.spriteExtrude = prefs.SpriteExtrude;
+                settings.spriteExtrude = (uint)Mathf.Clamp(prefs.ExtrudeEdges, 0, 32);
                 settings.spriteMeshType = prefs.SpriteMeshType;
 
                 if (changePivot)
                 {
-                    settings.spriteAlignment = (int)prefs.SpriteAlignment;
-                    if (prefs.SpriteAlignment == SpriteAlignment.Custom)
+                    settings.spriteAlignment = (int)prefs.Pivot;
+                    if (prefs.Pivot == SpriteAlignment.Custom)
                         settings.spritePivot = prefs.CustomPivot;
                 }
 
@@ -98,8 +98,11 @@ namespace Staple.EditorScripts
                     importer.spritePackingTag = prefs.PackingTag;
 
                 importer.SetTextureSettings(settings);
+#if UNITY_5_0
                 importer.SaveAndReimport();
-
+#else
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+#endif
                 EditorUtility.SetDirty(obj);
             }
         }

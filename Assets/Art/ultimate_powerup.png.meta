@@ -1,9 +1,24 @@
 fileFormatVersion: 2
 guid: c2a67aa85715c0241bda9b658d7d373a
-timeCreated: 1430513231
+timeCreated: 1430597664
 licenseType: Pro
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: ultimate_powerup_0
+    21300002: ultimate_powerup_1
+    21300004: ultimate_powerup_2
+    21300006: ultimate_powerup_3
+    21300008: ultimate_powerup_4
+    21300010: ultimate_powerup_5
+    21300012: ultimate_powerup_6
+    21300014: ultimate_powerup_7
+    21300016: ultimate_powerup_8
+    21300018: ultimate_powerup_9
+    21300020: ultimate_powerup_10
+    21300022: ultimate_powerup_11
+    21300024: ultimate_powerup_12
+    21300026: ultimate_powerup_13
+    21300028: ultimate_powerup_14
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -29,26 +44,176 @@ TextureImporter:
   textureFormat: -1
   maxTextureSize: 2048
   textureSettings:
-    filterMode: -1
-    aniso: -1
+    filterMode: 0
+    aniso: 16
     mipBias: -1
     wrapMode: 1
   nPOTScale: 0
   lightmap: 0
   rGBM: 0
   compressionQuality: 50
-  spriteMode: 1
-  spriteExtrude: 1
+  spriteMode: 2
+  spriteExtrude: 7
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: .5, y: .5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 50
   alphaIsTransparency: 1
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
-    sprites: []
+    sprites:
+    - name: ultimate_powerup_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 258
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_1
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 258
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_2
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 258
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_3
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 258
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 172
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_5
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 172
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_6
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 172
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_7
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 172
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 86
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_9
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 86
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_10
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 86
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_11
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 86
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_13
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 0
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ultimate_powerup_14
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 0
+        width: 86
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 
   assetBundleName: 

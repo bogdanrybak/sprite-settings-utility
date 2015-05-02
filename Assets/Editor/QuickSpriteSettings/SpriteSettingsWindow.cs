@@ -106,9 +106,9 @@ namespace Staple.EditorScripts
         {
             changePivot = EditorGUILayout.BeginToggleGroup("Apply Pivot", changePivot);
 
-            config.Settings.SpriteAlignment = (SpriteAlignment)EditorGUILayout.EnumPopup(config.Settings.SpriteAlignment);
+            config.Settings.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(config.Settings.Pivot);
 
-            if (config.Settings.SpriteAlignment == SpriteAlignment.Custom)
+            if (config.Settings.Pivot == SpriteAlignment.Custom)
                 config.Settings.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", config.Settings.CustomPivot);
 
             EditorGUILayout.EndToggleGroup();

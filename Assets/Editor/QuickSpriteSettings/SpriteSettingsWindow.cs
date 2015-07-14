@@ -94,8 +94,11 @@ namespace Staple.EditorScripts
             {
                 SpriteSettingsUtility.ApplyDefaultTextureSettings(config.Settings, changePivot, changePackingTag);
                 
-                UnityEditor.Sprites.Packer.RebuildAtlasCacheIfNeeded(
-                EditorUserBuildSettings.activeBuildTarget, true);
+				if (config.Settings.PackOnApply)
+				{
+                	UnityEditor.Sprites.Packer.RebuildAtlasCacheIfNeeded(
+                	EditorUserBuildSettings.activeBuildTarget, true);
+				}
                 
                 Close();
             }

@@ -27,7 +27,7 @@ You can find the Photoshop script along with installation and
 usage instructions in the /PhotoshopScript folder of this asset.
 
 Let me know if you have feature requests / improvements in mind.
-Bogdan Rybak boguzs@gmail.com, http://twitter.com/bogdan_rybak
+http://twitter.com/bogdan_rybak
 
 # Tips
 - If you are using source control and collaborating, you might want to ignore "Assets/Editor/QuickSpriteSettings/DefaultSpriteSettings.asset". This file will change slightly based on your last used settings.

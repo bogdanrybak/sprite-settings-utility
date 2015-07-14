@@ -33,6 +33,8 @@ namespace Staple.EditorScripts
         /// sheet_2.png,27,30,5
         /// </summary>
         public string SpritesheetDataFile = "_spritesheets.txt";
+
+		public bool PackOnApply = false;
     }
 
     [CustomPropertyDrawer(typeof(SpriteSettings))]

@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEditorInternal;
 using System.Collections;
+using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -36,10 +37,10 @@ namespace Staple.EditorScripts
                 // Try to slice it
                 var fileName = Path.GetFileNameWithoutExtension(path);
                 SpriteSheetData spriteSheetData = GetSpriteData(path, prefs.SpritesheetDataFile);
-
+				
+				// When we have text file data
                 if (spriteSheetData != null)
                 {
-
                     var gridRects = InternalSpriteUtility.GenerateGridSpriteRectangles(
                         AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
                         Vector2.zero, spriteSheetData.Size, Vector2.zero);
@@ -51,12 +52,13 @@ namespace Staple.EditorScripts
 
                     for (var i = 0; i < spriteSheet.Length; i++)
                     {
-                        bool changed = changePivot || !(importer.spritesheet != null && i < importer.spritesheet.Length);
+						bool sliceExists = importer.spritesheet != null && i < importer.spritesheet.Length;						
+                        bool changed = changePivot || !(sliceExists);
                         spriteSheet[i] = new SpriteMetaData
                         {
                             alignment = changed ? (int)prefs.Pivot : spriteSheet[i].alignment,
                             pivot = changed ? prefs.CustomPivot : spriteSheet[i].pivot,
-                            name = fileName + "_" + Array.IndexOf(gridRects, gridRects[i]),
+                            name =  sliceExists ? spriteSheet[i].name : fileName + "_" + Array.IndexOf(gridRects, gridRects[i]),
                             rect = gridRects[i]
                         };
                     }
@@ -70,7 +72,21 @@ namespace Staple.EditorScripts
                     else
                         importer.spritesheet = spriteSheet;
                 }
-                else
+                else if (importer.spritesheet != null && changePivot) // for existing sliced sheets without data in the text file and wantint to change pivot
+				{
+					var spriteSheet = new SpriteMetaData[importer.spritesheet.Length];
+					
+					for (int i = 0; i < importer.spritesheet.Length; i++)
+					{
+						var spriteMetaData = importer.spritesheet[i];
+						spriteMetaData.alignment = (int)prefs.Pivot;
+						spriteMetaData.pivot = prefs.CustomPivot;
+						spriteSheet[i] = spriteMetaData;
+					}
+					
+					importer.spritesheet = spriteSheet;
+				}
+				else
                     importer.spriteImportMode = SpriteImportMode.Single;
 
                 TextureImporterSettings settings = new TextureImporterSettings();

@@ -32,6 +32,8 @@ namespace Staple.EditorScripts
         }
 
         private Editor textureSettingsEditor;
+        private SpriteSettings currentSelectedSettings;
+        private int selectedSettingIndex;
         private bool showSettings;
         private bool changePivot = true;
         private bool changePackingTag;
@@ -54,7 +56,11 @@ namespace Staple.EditorScripts
 
         void OnGUI()
         {
-            if (config == null || config.Settings == null) return;
+            if (config == null) return;
+            
+            if (config.SettingsSets == null || config.SettingsSets.Count == 0) {
+                return;
+            }
 
             EditorGUILayout.BeginVertical(EditorStyles.inspectorFullWidthMargins);
             EditorGUILayout.Space();
@@ -62,6 +68,8 @@ namespace Staple.EditorScripts
             DrawApplyButton();
 
             EditorGUILayout.Space();
+            
+            DrawSaveSettingSelect ();
 
             DrawQuickSettings();
 
@@ -92,9 +100,9 @@ namespace Staple.EditorScripts
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("Apply"))
             {
-                SpriteSettingsUtility.ApplyDefaultTextureSettings(config.Settings, changePivot, changePackingTag);
+                SpriteSettingsUtility.ApplyDefaultTextureSettings(currentSelectedSettings, changePivot, changePackingTag);
                 
-				if (config.Settings.PackOnApply)
+				if (currentSelectedSettings.PackOnApply)
 				{
                 	UnityEditor.Sprites.Packer.RebuildAtlasCacheIfNeeded(
                 	EditorUserBuildSettings.activeBuildTarget, true);
@@ -104,15 +112,28 @@ namespace Staple.EditorScripts
             }
             GUI.backgroundColor = defaultBg;
         }
+        
+        void DrawSaveSettingSelect ()
+        {
+            string[] savedSetNames = new string[config.SettingsSets.Count];
+            int[] savedSetIndeces = new int[savedSetNames.Length];
+            for (int i = 0; i < savedSetNames.Length; i++) {
+                savedSetNames[i] = config.SettingsSets[i].Name;
+                savedSetIndeces[i] = i;
+            }
+            selectedSettingIndex = EditorGUILayout.IntPopup ("Saved Settings", selectedSettingIndex, 
+                                                        savedSetNames, savedSetIndeces);
+            currentSelectedSettings = config.SettingsSets [selectedSettingIndex];
+        }
 
         void DrawQuickSettings()
         {
             changePivot = EditorGUILayout.BeginToggleGroup("Apply Pivot", changePivot);
 
-            config.Settings.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(config.Settings.Pivot);
+            currentSelectedSettings.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(currentSelectedSettings.Pivot);
 
-            if (config.Settings.Pivot == SpriteAlignment.Custom)
-                config.Settings.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", config.Settings.CustomPivot);
+            if (currentSelectedSettings.Pivot == SpriteAlignment.Custom)
+                currentSelectedSettings.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", currentSelectedSettings.CustomPivot);
 
             EditorGUILayout.EndToggleGroup();
 
@@ -120,7 +141,7 @@ namespace Staple.EditorScripts
 
             changePackingTag = EditorGUILayout.BeginToggleGroup("Apply Packing Tag", changePackingTag);
 
-            config.Settings.PackingTag = EditorGUILayout.TextField(config.Settings.PackingTag);
+            currentSelectedSettings.PackingTag = EditorGUILayout.TextField(currentSelectedSettings.PackingTag);
 
             if (changePackingTag)
             {
@@ -128,7 +149,7 @@ namespace Staple.EditorScripts
                 {
                     if (GUILayout.Button(name, EditorStyles.miniButton))
                     {
-                        config.Settings.PackingTag = name;
+                        currentSelectedSettings.PackingTag = name;
                         EditorGUI.FocusTextInControl(name);
                     }
                 }
@@ -158,7 +179,7 @@ namespace Staple.EditorScripts
 
                     string metaData = "";
 
-                    var spriteSheetData = SpriteSettingsUtility.GetSpriteData(path, config.Settings.SpritesheetDataFile);
+                    var spriteSheetData = SpriteSettingsUtility.GetSpriteData(path, currentSelectedSettings.SpritesheetDataFile);
                     if (spriteSheetData != null)
                     {
                         metaData = " " + spriteSheetData.Size + ", " + spriteSheetData.Frames + " frames";

@@ -12,8 +12,6 @@ namespace Staple.EditorScripts
         // Future ready: Implement sprite settings sets;
         public List<SpriteSettings> SettingsSets;
 
-        public SpriteSettings Settings { get; private set; }
-
         void OnEnable()
         {
             //hideFlags = HideFlags.DontSaveInBuild;
@@ -23,36 +21,19 @@ namespace Staple.EditorScripts
             {
                 SettingsSets.Add(new SpriteSettings());
             }
-
-            Settings = SettingsSets[0];
         }
     }
 
     [CustomEditor(typeof(SpriteSettingsConfig))]
     public class SpriteSettingsConfigEditor : Editor
     {
-        SerializedProperty settings;
-
-        void Awake()
-        {
-            settings = serializedObject.FindProperty("SettingsSets");
-        }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
 
-            if (settings.isArray)
-            {
-                settings.Next(true); // generic field
-                settings.Next(true); // array size field
-
-                // first array index
-                settings.Next(true);
-
-                EditorGUILayout.PropertyField(settings);
-            }
-
+            DrawDefaultInspector ();
+            
             serializedObject.ApplyModifiedProperties();
         }
     }

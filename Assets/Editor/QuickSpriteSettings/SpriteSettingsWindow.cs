@@ -77,18 +77,7 @@ namespace Staple.EditorScripts
 
             bodyScrollPos = EditorGUILayout.BeginScrollView(bodyScrollPos);
 
-            DrawSelectedTextureInfo();            
-
-            EditorGUILayout.Space();
-
-            showSettings = EditorGUILayout.Foldout(showSettings, "Default Texture Settings");
-
-            if (showSettings)
-            {
-                textureSettingsEditor = Editor.CreateEditor(config);
-                textureSettingsEditor.OnInspectorGUI();
-                EditorGUILayout.Space();
-            }
+            DrawSelectedTextureInfo();
 
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();

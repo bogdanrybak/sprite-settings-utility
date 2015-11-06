@@ -31,7 +31,6 @@ namespace Staple.EditorScripts
             return false;
         }
 
-        private Editor textureSettingsEditor;
         private SpriteSettings currentSelectedSettings;
         private int selectedSettingIndex;
         private bool showSettings;
@@ -70,6 +69,8 @@ namespace Staple.EditorScripts
             EditorGUILayout.Space();
             
             DrawSaveSettingSelect ();
+            
+            EditorGUILayout.Space ();
 
             DrawQuickSettings();
 
@@ -110,9 +111,16 @@ namespace Staple.EditorScripts
                 savedSetNames[i] = config.SettingsSets[i].Name;
                 savedSetIndeces[i] = i;
             }
-            selectedSettingIndex = EditorGUILayout.IntPopup ("Saved Settings", selectedSettingIndex, 
+            EditorGUILayout.BeginHorizontal ();
+            selectedSettingIndex = EditorGUILayout.IntPopup ("Setting to Apply", selectedSettingIndex, 
                                                         savedSetNames, savedSetIndeces);
             currentSelectedSettings = config.SettingsSets [selectedSettingIndex];
+            if (GUILayout.Button ("Edit", GUILayout.MaxWidth(80.0f))) {
+                SpriteSettingsConfigWindow window = 
+                    EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
+                window.SelectSetting (selectedSettingIndex);
+            }
+            EditorGUILayout.EndHorizontal ();
         }
 
         void DrawQuickSettings()

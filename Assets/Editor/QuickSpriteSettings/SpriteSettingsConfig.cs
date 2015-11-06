@@ -28,7 +28,6 @@ namespace Staple.EditorScripts
     public class SpriteSettingsConfigEditor : Editor
     {
         private ReorderableList list;
-        private Editor textureSettingsEditor;
 
         private void OnEnable() {
             list = new ReorderableList(serializedObject, 
@@ -46,7 +45,7 @@ namespace Staple.EditorScripts
             list.DoLayoutList();
             
             EditorGUILayout.Space ();
-            EditorGUILayout.LabelField ("Selected Settings", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField ("Selected Settings", EditorStyles.largeLabel);
             
             DrawSelectedSpriteSetting (serializedObject);
             
@@ -85,5 +84,14 @@ namespace Staple.EditorScripts
 		
             return listCopy.intValue;
 		}
+        
+        public void SelectSetting (int settingIndex)
+        {
+            if (settingIndex >= list.count || settingIndex < 0) {
+                return;
+            }
+            
+            list.index = settingIndex;
+        }
     }
 }

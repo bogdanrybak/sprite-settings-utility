@@ -22,6 +22,11 @@ namespace Staple.EditorScripts
             configEditor = Editor.CreateEditor (config);
         }
 
+        void OnInspectorUpdate()
+        {
+            Repaint();
+        }
+
         void OnGUI()
         {
             EditorGUILayout.BeginVertical(EditorStyles.inspectorDefaultMargins);

@@ -19,8 +19,13 @@ namespace Staple.EditorScripts
             SettingsSets = SettingsSets ?? new List<SpriteSettings>();
             if (SettingsSets.Count < 1)
             {
-                SettingsSets.Add(new SpriteSettings());
+                AddDefaultSpriteSetting ();
             }
+        }
+        
+        public void AddDefaultSpriteSetting ()
+        {
+            SettingsSets.Add(new SpriteSettings());
         }
     }
 

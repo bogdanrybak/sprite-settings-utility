@@ -58,6 +58,7 @@ namespace Staple.EditorScripts
             if (config == null) return;
             
             if (config.SettingsSets == null || config.SettingsSets.Count == 0) {
+                DrawEmptySaveSettings ();
                 return;
             }
 
@@ -103,6 +104,19 @@ namespace Staple.EditorScripts
             GUI.backgroundColor = defaultBg;
         }
         
+        void DrawEmptySaveSettings ()
+        {
+            EditorGUILayout.Space ();
+            EditorGUILayout.LabelField ("Create a Saved SpriteSetting to start applying SpriteSettings.");
+            if (GUILayout.Button ("Create Setting")) {
+                EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
+                if (config != null && config.SettingsSets.Count == 0) {
+                    config.AddDefaultSpriteSetting ();
+                }
+            }
+            EditorGUILayout.Space ();
+        }
+        
         void DrawSaveSettingSelect ()
         {
             string[] savedSetNames = new string[config.SettingsSets.Count];
@@ -110,6 +124,10 @@ namespace Staple.EditorScripts
             for (int i = 0; i < savedSetNames.Length; i++) {
                 savedSetNames[i] = config.SettingsSets[i].Name;
                 savedSetIndeces[i] = i;
+            }
+            // Make sure a previously selected index still exists
+            if (selectedSettingIndex >= savedSetNames.Length) {
+                selectedSettingIndex = savedSetNames.Length -1;
             }
             EditorGUILayout.BeginHorizontal ();
             selectedSettingIndex = EditorGUILayout.IntPopup ("Setting to Apply", selectedSettingIndex, 

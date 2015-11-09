@@ -76,17 +76,17 @@ namespace Staple.EditorScripts
         }
         
         int GetPropertyArraySize (SerializedProperty listAsProperty)
-		{
-			if (!listAsProperty.isArray) {
-				return -1;
-			}
-		
-			// Don't iterate on the original
-			SerializedProperty listCopy = listAsProperty.Copy ();
-		
-			listCopy.Next (true); // Skip generic element
-			listCopy.Next (true); // This is the array size
-		
+        {
+            if (!listAsProperty.isArray) {
+                return -1;
+            }
+        
+            // Don't iterate on the original
+            SerializedProperty listCopy = listAsProperty.Copy ();
+        
+            listCopy.Next (true); // Skip generic element
+            listCopy.Next (true); // This is the array size
+        
             return listCopy.intValue;
 		}
         

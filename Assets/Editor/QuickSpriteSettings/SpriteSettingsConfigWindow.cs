@@ -6,20 +6,17 @@ namespace Staple.EditorScripts
 {
     public class SpriteSettingsConfigWindow : EditorWindow
     {
-        const string SettingsPath = "Assets/Editor/QuickSpriteSettings/DefaultSpriteSettings.asset";
         Editor configEditor;
         private SpriteSettingsConfig config;
         private Vector2 scrollPos;
 
         void OnEnable()
         {
-            config = 
-                AssetDatabase.LoadAssetAtPath(SettingsPath, typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
-
-            if (config == null)
-                config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(SettingsPath);
-                
-            configEditor = Editor.CreateEditor (config);
+            config = AssetDatabase.LoadAssetAtPath(SpriteSettingsConfig.DefaultPath,
+                 typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
+            if (config != null) {
+                configEditor = Editor.CreateEditor (config);
+            }
         }
 
         void OnInspectorUpdate()
@@ -29,6 +26,8 @@ namespace Staple.EditorScripts
 
         void OnGUI()
         {
+            if (config == null) return;
+            
             EditorGUILayout.BeginVertical(EditorStyles.inspectorDefaultMargins);
             scrollPos = EditorGUILayout.BeginScrollView (scrollPos);
             EditorGUILayout.Space ();

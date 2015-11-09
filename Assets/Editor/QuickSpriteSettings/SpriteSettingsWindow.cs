@@ -6,8 +6,6 @@ namespace Staple.EditorScripts
 {
     public class SpriteSettingsWindow : EditorWindow
     {
-        const string SettingsPath = "Assets/Editor/QuickSpriteSettings/DefaultSpriteSettings.asset";
-
         [MenuItem("Assets/Quick Sprite Settings")]
         public static void Init()
         {
@@ -41,11 +39,16 @@ namespace Staple.EditorScripts
 
         void OnEnable()
         {
-            config = 
-                AssetDatabase.LoadAssetAtPath(SettingsPath, typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
+            LoadOrCreateConfig ();
+        }
+        
+        void LoadOrCreateConfig ()
+        {
+            config = AssetDatabase.LoadAssetAtPath(SpriteSettingsConfig.DefaultPath,
+                typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
 
             if (config == null)
-                config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(SettingsPath);
+                config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(SpriteSettingsConfig.DefaultPath);
         }
 
         void OnInspectorUpdate()
@@ -55,9 +58,7 @@ namespace Staple.EditorScripts
 
         void OnGUI()
         {
-            if (config == null) return;
-            
-            if (config.SettingsSets == null || config.SettingsSets.Count == 0) {
+            if (config == null || config.SettingsSets == null || config.SettingsSets.Count == 0) {
                 DrawEmptySaveSettings ();
                 return;
             }
@@ -109,6 +110,9 @@ namespace Staple.EditorScripts
             EditorGUILayout.Space ();
             EditorGUILayout.LabelField ("Create a Saved SpriteSetting to start applying SpriteSettings.");
             if (GUILayout.Button ("Create Setting")) {
+                if (config == null) {
+                    LoadOrCreateConfig ();
+                }
                 EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
                 if (config != null && config.SettingsSets.Count == 0) {
                     config.AddDefaultSpriteSetting ();

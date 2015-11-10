@@ -6,8 +6,6 @@ namespace Staple.EditorScripts
 {
     public class SpriteSettingsWindow : EditorWindow
     {
-        const string SettingsPath = "Assets/Editor/QuickSpriteSettings/DefaultSpriteSettings.asset";
-
         [MenuItem("Assets/Quick Sprite Settings")]
         public static void Init()
         {
@@ -31,7 +29,8 @@ namespace Staple.EditorScripts
             return false;
         }
 
-        private Editor textureSettingsEditor;
+        private SpriteSettings currentSelectedSettings;
+        private int selectedSettingIndex;
         private bool showSettings;
         private bool changePivot = true;
         private bool changePackingTag;
@@ -40,11 +39,16 @@ namespace Staple.EditorScripts
 
         void OnEnable()
         {
-            config = 
-                AssetDatabase.LoadAssetAtPath(SettingsPath, typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
+            LoadOrCreateConfig ();
+        }
+        
+        void LoadOrCreateConfig ()
+        {
+            config = AssetDatabase.LoadAssetAtPath(SpriteSettingsConfig.DefaultPath,
+                typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
 
             if (config == null)
-                config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(SettingsPath);
+                config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(SpriteSettingsConfig.DefaultPath);
         }
 
         void OnInspectorUpdate()
@@ -54,7 +58,10 @@ namespace Staple.EditorScripts
 
         void OnGUI()
         {
-            if (config == null || config.Settings == null) return;
+            if (config == null || config.SettingsSets == null || config.SettingsSets.Count == 0) {
+                DrawEmptySaveSettings ();
+                return;
+            }
 
             EditorGUILayout.BeginVertical(EditorStyles.inspectorFullWidthMargins);
             EditorGUILayout.Space();
@@ -62,6 +69,10 @@ namespace Staple.EditorScripts
             DrawApplyButton();
 
             EditorGUILayout.Space();
+            
+            DrawSaveSettingSelect ();
+            
+            EditorGUILayout.Space ();
 
             DrawQuickSettings();
 
@@ -69,18 +80,7 @@ namespace Staple.EditorScripts
 
             bodyScrollPos = EditorGUILayout.BeginScrollView(bodyScrollPos);
 
-            DrawSelectedTextureInfo();            
-
-            EditorGUILayout.Space();
-
-            showSettings = EditorGUILayout.Foldout(showSettings, "Default Texture Settings");
-
-            if (showSettings)
-            {
-                textureSettingsEditor = Editor.CreateEditor(config);
-                textureSettingsEditor.OnInspectorGUI();
-                EditorGUILayout.Space();
-            }
+            DrawSelectedTextureInfo();
 
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
@@ -92,9 +92,9 @@ namespace Staple.EditorScripts
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("Apply"))
             {
-                SpriteSettingsUtility.ApplyDefaultTextureSettings(config.Settings, changePivot, changePackingTag);
+                SpriteSettingsUtility.ApplyDefaultTextureSettings(currentSelectedSettings, changePivot, changePackingTag);
                 
-				if (config.Settings.PackOnApply)
+				if (currentSelectedSettings.PackOnApply)
 				{
                 	UnityEditor.Sprites.Packer.RebuildAtlasCacheIfNeeded(
                 	EditorUserBuildSettings.activeBuildTarget, true);
@@ -104,15 +104,55 @@ namespace Staple.EditorScripts
             }
             GUI.backgroundColor = defaultBg;
         }
+        
+        void DrawEmptySaveSettings ()
+        {
+            EditorGUILayout.Space ();
+            EditorGUILayout.LabelField ("Create a Saved SpriteSetting to start applying SpriteSettings.");
+            if (GUILayout.Button ("Create Setting")) {
+                if (config == null) {
+                    LoadOrCreateConfig ();
+                }
+                EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
+                if (config != null && config.SettingsSets.Count == 0) {
+                    config.AddDefaultSpriteSetting ();
+                }
+            }
+            EditorGUILayout.Space ();
+        }
+        
+        void DrawSaveSettingSelect ()
+        {
+            string[] savedSetNames = new string[config.SettingsSets.Count];
+            int[] savedSetIndeces = new int[savedSetNames.Length];
+            for (int i = 0; i < savedSetNames.Length; i++) {
+                savedSetNames[i] = config.SettingsSets[i].Name;
+                savedSetIndeces[i] = i;
+            }
+            // Make sure a previously selected index still exists
+            if (selectedSettingIndex >= savedSetNames.Length) {
+                selectedSettingIndex = savedSetNames.Length -1;
+            }
+            EditorGUILayout.BeginHorizontal ();
+            selectedSettingIndex = EditorGUILayout.IntPopup ("Setting to Apply", selectedSettingIndex, 
+                                                        savedSetNames, savedSetIndeces);
+            currentSelectedSettings = config.SettingsSets [selectedSettingIndex];
+            if (GUILayout.Button ("Edit", GUILayout.MaxWidth(80.0f))) {
+                SpriteSettingsConfigWindow window = 
+                    EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
+                window.SelectSetting (selectedSettingIndex);
+            }
+            EditorGUILayout.EndHorizontal ();
+        }
 
         void DrawQuickSettings()
         {
             changePivot = EditorGUILayout.BeginToggleGroup("Apply Pivot", changePivot);
 
-            config.Settings.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(config.Settings.Pivot);
+            currentSelectedSettings.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(currentSelectedSettings.Pivot);
 
-            if (config.Settings.Pivot == SpriteAlignment.Custom)
-                config.Settings.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", config.Settings.CustomPivot);
+            if (currentSelectedSettings.Pivot == SpriteAlignment.Custom)
+                currentSelectedSettings.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", currentSelectedSettings.CustomPivot);
 
             EditorGUILayout.EndToggleGroup();
 
@@ -120,7 +160,7 @@ namespace Staple.EditorScripts
 
             changePackingTag = EditorGUILayout.BeginToggleGroup("Apply Packing Tag", changePackingTag);
 
-            config.Settings.PackingTag = EditorGUILayout.TextField(config.Settings.PackingTag);
+            currentSelectedSettings.PackingTag = EditorGUILayout.TextField(currentSelectedSettings.PackingTag);
 
             if (changePackingTag)
             {
@@ -128,7 +168,7 @@ namespace Staple.EditorScripts
                 {
                     if (GUILayout.Button(name, EditorStyles.miniButton))
                     {
-                        config.Settings.PackingTag = name;
+                        currentSelectedSettings.PackingTag = name;
                         EditorGUI.FocusTextInControl(name);
                     }
                 }
@@ -158,7 +198,7 @@ namespace Staple.EditorScripts
 
                     string metaData = "";
 
-                    var spriteSheetData = SpriteSettingsUtility.GetSpriteData(path, config.Settings.SpritesheetDataFile);
+                    var spriteSheetData = SpriteSettingsUtility.GetSpriteData(path, currentSelectedSettings.SpritesheetDataFile);
                     if (spriteSheetData != null)
                     {
                         metaData = " " + spriteSheetData.Size + ", " + spriteSheetData.Frames + " frames";

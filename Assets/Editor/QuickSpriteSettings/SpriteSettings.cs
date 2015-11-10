@@ -40,7 +40,7 @@ namespace Staple.EditorScripts
     [CustomPropertyDrawer(typeof(SpriteSettings))]
     public class SpriteSettingsEditor : PropertyDrawer
     {
-        static readonly string[] dontInclude = new string[] { "Name" };
+        static readonly string[] dontInclude = new string[] { "" };
         static readonly string[] spaceBefore = new string[] { "SpriteMeshType", "GenerateMipMaps", "SpritesheetDataFile" };
         static readonly int[] maxSizes = { 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
 

@@ -39,8 +39,7 @@ namespace Staple.EditorScripts
 
         void OnEnable()
         {
-            config = AssetDatabase.LoadAssetAtPath(SpriteSettingsConfig.DefaultPath,
-                typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
+            config = SpriteSettingsConfig.LoadConfig ();
         }
 
         void OnInspectorUpdate()
@@ -115,7 +114,24 @@ namespace Staple.EditorScripts
         
         void CreateConfig ()
         {
-            config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(SpriteSettingsConfig.DefaultPath);
+            string spriteConfigPath = GetDefaultPathForConfig ();
+            config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(spriteConfigPath);
+            
+            // Store GUID of created Config for later loading
+            string spriteConfigGUID = AssetDatabase.AssetPathToGUID (spriteConfigPath);
+            EditorPrefs.SetString (SpriteSettingsConfig.ConfigGUIDKey, spriteConfigGUID);
+        }
+        
+        string GetDefaultPathForConfig ()
+        {
+            // Use this script's path by default
+            MonoScript script = MonoScript.FromScriptableObject (this);
+            string scriptPath = AssetDatabase.GetAssetPath (script);
+            string scriptDirectory = System.IO.Path.GetDirectoryName (scriptPath);
+            string filename = "DefaultSpriteSettings.asset";
+            string spriteConfigPath = scriptDirectory + System.IO.Path.DirectorySeparatorChar + filename;
+            
+            return spriteConfigPath;
         }
         
         void DrawSaveSettingSelect ()

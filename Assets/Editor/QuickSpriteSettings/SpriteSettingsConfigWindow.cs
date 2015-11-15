@@ -12,8 +12,7 @@ namespace Staple.EditorScripts
 
         void OnEnable()
         {
-            config = AssetDatabase.LoadAssetAtPath(SpriteSettingsConfig.DefaultPath,
-                 typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
+            config = SpriteSettingsConfig.LoadConfig ();
             if (config != null) {
                 configEditor = Editor.CreateEditor (config);
             }

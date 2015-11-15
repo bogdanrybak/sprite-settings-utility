@@ -11,7 +11,7 @@ namespace Staple.EditorScripts
     {
         // Future ready: Implement sprite settings sets;
         public List<SpriteSettings> SettingsSets;
-        public const string DefaultPath = "Assets/Editor/QuickSpriteSettings/DefaultSpriteSettings.asset";
+        public const string ConfigGUIDKey = "SpriteSettingsConfigGUID";
 
         void OnEnable()
         {
@@ -27,6 +27,14 @@ namespace Staple.EditorScripts
         public void AddDefaultSpriteSetting ()
         {
             SettingsSets.Add(new SpriteSettings());
+        }
+        
+        public static SpriteSettingsConfig LoadConfig ()
+        {
+            string configGUID = EditorPrefs.GetString (SpriteSettingsConfig.ConfigGUIDKey);
+            string configPath = AssetDatabase.GUIDToAssetPath (configGUID);
+            return AssetDatabase.LoadAssetAtPath(configPath,
+                typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
         }
     }
 

@@ -39,16 +39,7 @@ namespace Staple.EditorScripts
 
         void OnEnable()
         {
-            LoadOrCreateConfig ();
-        }
-        
-        void LoadOrCreateConfig ()
-        {
-            config = AssetDatabase.LoadAssetAtPath(SpriteSettingsConfig.DefaultPath,
-                typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
-
-            if (config == null)
-                config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(SpriteSettingsConfig.DefaultPath);
+            config = SpriteSettingsConfig.LoadConfig ();
         }
 
         void OnInspectorUpdate()
@@ -111,14 +102,36 @@ namespace Staple.EditorScripts
             EditorGUILayout.LabelField ("Create a Saved SpriteSetting to start applying SpriteSettings.");
             if (GUILayout.Button ("Create Setting")) {
                 if (config == null) {
-                    LoadOrCreateConfig ();
+                    CreateConfig ();
                 }
                 EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
-                if (config != null && config.SettingsSets.Count == 0) {
+                if (config.SettingsSets.Count == 0) {
                     config.AddDefaultSpriteSetting ();
                 }
             }
             EditorGUILayout.Space ();
+        }
+        
+        void CreateConfig ()
+        {
+            string spriteConfigPath = GetDefaultPathForConfig ();
+            config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(spriteConfigPath);
+            
+            // Store GUID of created Config for later loading
+            string spriteConfigGUID = AssetDatabase.AssetPathToGUID (spriteConfigPath);
+            EditorPrefs.SetString (SpriteSettingsConfig.ConfigGUIDKey, spriteConfigGUID);
+        }
+        
+        string GetDefaultPathForConfig ()
+        {
+            // Use this script's path by default
+            MonoScript script = MonoScript.FromScriptableObject (this);
+            string scriptPath = AssetDatabase.GetAssetPath (script);
+            string scriptDirectory = System.IO.Path.GetDirectoryName (scriptPath);
+            string filename = "DefaultSpriteSettings.asset";
+            string spriteConfigPath = scriptDirectory + System.IO.Path.DirectorySeparatorChar + filename;
+            
+            return spriteConfigPath;
         }
         
         void DrawSaveSettingSelect ()

@@ -39,16 +39,8 @@ namespace Staple.EditorScripts
 
         void OnEnable()
         {
-            LoadOrCreateConfig ();
-        }
-        
-        void LoadOrCreateConfig ()
-        {
             config = AssetDatabase.LoadAssetAtPath(SpriteSettingsConfig.DefaultPath,
                 typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
-
-            if (config == null)
-                config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(SpriteSettingsConfig.DefaultPath);
         }
 
         void OnInspectorUpdate()
@@ -111,14 +103,19 @@ namespace Staple.EditorScripts
             EditorGUILayout.LabelField ("Create a Saved SpriteSetting to start applying SpriteSettings.");
             if (GUILayout.Button ("Create Setting")) {
                 if (config == null) {
-                    LoadOrCreateConfig ();
+                    CreateConfig ();
                 }
                 EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
-                if (config != null && config.SettingsSets.Count == 0) {
+                if (config.SettingsSets.Count == 0) {
                     config.AddDefaultSpriteSetting ();
                 }
             }
             EditorGUILayout.Space ();
+        }
+        
+        void CreateConfig ()
+        {
+            config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(SpriteSettingsConfig.DefaultPath);
         }
         
         void DrawSaveSettingSelect ()

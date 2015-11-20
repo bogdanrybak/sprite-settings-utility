@@ -11,7 +11,7 @@ namespace Staple.EditorScripts
     {
         // Future ready: Implement sprite settings sets;
         public List<SpriteSettings> SettingsSets;
-        public const string DefaultPath = "Assets/Editor/QuickSpriteSettings/DefaultSpriteSettings.asset";
+        public const string DefaultFilename = "DefaultSpriteSettings.asset";
 
         void OnEnable()
         {

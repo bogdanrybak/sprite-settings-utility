@@ -2,14 +2,11 @@
 using UnityEditor;
 using UnityEditorInternal;
 using System.Collections.Generic;
-using System.Linq;
-using System;
 
 namespace Staple.EditorScripts
 {
     public class SpriteSettingsConfig : ScriptableObject
     {
-        // Future ready: Implement sprite settings sets;
         public List<SpriteSettings> SettingsSets;
         public const string DefaultFilename = "DefaultSpriteSettings.asset";
 
@@ -42,6 +39,13 @@ namespace Staple.EditorScripts
             list.drawHeaderCallback = (Rect rect) => {  
                 EditorGUI.LabelField(rect, "Saved SpriteSettings");
             };
+            list.onAddCallback = (ReorderableList l) => {
+                SpriteSettingsConfig objAsConfig = (SpriteSettingsConfig) serializedObject.targetObject;
+                objAsConfig.AddDefaultSpriteSetting ();
+                // Predict new size since it's not serialized yet
+                int newSize = l.serializedProperty.arraySize + 1;
+                SelectSetting (newSize - 1);
+            };
         }
 
         public override void OnInspectorGUI()
@@ -64,11 +68,11 @@ namespace Staple.EditorScripts
             
             SerializedProperty settingsSets = serializedObject.FindProperty ("SettingsSets");
             
-            if (selectedIndex >= 0) {
+            if (selectedIndex >= 0 && selectedIndex < settingsSets.arraySize) {
                 EditorGUILayout.PropertyField (settingsSets.GetArrayElementAtIndex (selectedIndex));
             } else {
                 EditorStyles.label.wordWrap = true;
-                if (GetPropertyArraySize (settingsSets) > 0) {
+                if (settingsSets.arraySize > 0) {
                     EditorGUILayout.LabelField ("Select a Saved SpriteSetting to edit or remove it.");
                 } else {
                     EditorGUILayout.LabelField ("No SpriteSettings have been saved. Create a new SpriteSetting from the list above.");
@@ -76,24 +80,11 @@ namespace Staple.EditorScripts
             }
         }
         
-        int GetPropertyArraySize (SerializedProperty listAsProperty)
-        {
-            if (!listAsProperty.isArray) {
-                return -1;
-            }
-        
-            // Don't iterate on the original
-            SerializedProperty listCopy = listAsProperty.Copy ();
-        
-            listCopy.Next (true); // Skip generic element
-            listCopy.Next (true); // This is the array size
-        
-            return listCopy.intValue;
-		}
-        
         public void SelectSetting (int settingIndex)
         {
-            if (settingIndex >= list.count || settingIndex < 0) {
+            // Note it's allowed to select indeces outside list bounds since we need to select
+            // items before they are serialized sometimes.
+            if (settingIndex < 0) {
                 return;
             }
             

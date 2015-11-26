@@ -9,12 +9,10 @@ namespace Staple.EditorScripts
         Editor configEditor;
         private SpriteSettingsConfig config;
         private Vector2 scrollPos;
-
-        void OnEnable()
-        {
-            config = AssetDatabase.LoadAssetAtPath(SpriteSettingsConfig.DefaultPath,
-                 typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
-            if (config != null) {
+        
+        public void SetConfig (SpriteSettingsConfig config) {
+            this.config = config;
+            if (this.config != null) {
                 configEditor = Editor.CreateEditor (config);
             }
         }
@@ -26,7 +24,11 @@ namespace Staple.EditorScripts
 
         void OnGUI()
         {
-            if (config == null) return;
+            if (config == null) {
+                EditorGUILayout.HelpBox ("Trying to view Saved SpriteSettings but no settings file exists.", 
+                    MessageType.Error);
+                return;
+            }
             
             EditorGUILayout.BeginVertical(EditorStyles.inspectorDefaultMargins);
             scrollPos = EditorGUILayout.BeginScrollView (scrollPos);
@@ -39,6 +41,9 @@ namespace Staple.EditorScripts
         }
         public void SelectSetting (int settingIndex)
         {
+            if (configEditor == null) {
+                return;
+            }
             ((SpriteSettingsConfigEditor)configEditor).SelectSetting (settingIndex);
         }
     }

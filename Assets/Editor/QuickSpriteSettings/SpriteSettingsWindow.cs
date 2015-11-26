@@ -36,6 +36,7 @@ namespace Staple.EditorScripts
         private bool changePackingTag;
         private SpriteSettingsConfig config;
         private Vector2 bodyScrollPos;
+        SpriteSettingsConfigWindow configWindow;
 
         void OnEnable()
         {
@@ -92,6 +93,10 @@ namespace Staple.EditorScripts
 				}
                 
                 Close();
+                if (configWindow != null) 
+                {
+                    configWindow.Close ();
+                }
             }
             GUI.backgroundColor = defaultBg;
         }
@@ -130,9 +135,9 @@ namespace Staple.EditorScripts
         
         void ShowConfigWindow (int indexToFocus)
         {
-                var window = EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
-                window.SetConfig (config);
-                window.SelectSetting (indexToFocus);
+                configWindow = EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
+                configWindow.SetConfig (config);
+                configWindow.SelectSetting (indexToFocus);
         }
         
         void DrawSaveSettingSelect ()

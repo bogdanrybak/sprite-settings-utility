@@ -16,6 +16,22 @@ namespace Staple.EditorScripts
                 configEditor = Editor.CreateEditor (config);
             }
         }
+        void OnEnable ()
+        {
+            // Reload config if this window gets rebuilt (which happens when recompiling with an open window)
+            ReloadConfig ();
+        }
+        
+        void ReloadConfig ()
+        {
+            if (config != null) 
+            {
+                config = AssetDatabase.LoadAssetAtPath<SpriteSettingsConfig> (AssetDatabase.GetAssetPath (config));
+                if (this.config != null ) {
+                    configEditor = Editor.CreateEditor (config);
+                }
+            }
+        }
 
         void OnInspectorUpdate()
         {

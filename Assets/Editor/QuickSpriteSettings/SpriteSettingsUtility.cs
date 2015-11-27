@@ -35,58 +35,41 @@ namespace Staple.EditorScripts
                 if (importer == null) continue;
 
                 // Try to slice it
-                var fileName = Path.GetFileNameWithoutExtension(path);
                 SpriteSheetData spriteSheetData = GetSpriteData(path, prefs.SpritesheetDataFile);
-				
-				// When we have text file data
+                
+                // When we have text file data
                 if (spriteSheetData != null)
                 {
-                    var gridRects = InternalSpriteUtility.GenerateGridSpriteRectangles(
-                        AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
-                        Vector2.zero, spriteSheetData.Size, Vector2.zero);
-
-                    var spriteSheet = importer.spritesheet ?? new SpriteMetaData[gridRects.Length];
-
-                    if (importer.spritesheet != null)
-                        spriteSheet = spriteSheet.Concat(new SpriteMetaData[Mathf.Max(0, gridRects.Length - importer.spritesheet.Length)]).ToArray();
-
-                    for (var i = 0; i < spriteSheet.Length; i++)
-                    {
-						bool sliceExists = importer.spritesheet != null && i < importer.spritesheet.Length;						
-                        bool changed = changePivot || !(sliceExists);
-                        spriteSheet[i] = new SpriteMetaData
-                        {
-                            alignment = changed ? (int)prefs.Pivot : spriteSheet[i].alignment,
-                            pivot = changed ? prefs.CustomPivot : spriteSheet[i].pivot,
-                            name =  sliceExists ? spriteSheet[i].name : fileName + "_" + Array.IndexOf(gridRects, gridRects[i]),
-                            rect = gridRects[i]
-                        };
+                    SpriteMetaData[] spriteSheet;
+                    if (prefs.GridSlicing == SpriteSettings.GridSlicingMode.SliceAll) {
+                        spriteSheet = SpriteSlicer.CreateSpriteSheetForTexture (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
+                            spriteSheetData.Size, prefs.Pivot);
+                    } else {
+                        spriteSheet = SpriteSlicer.CreateSpriteSheetForTextureBogdan (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
+                            spriteSheetData.Size, changePivot, prefs.Pivot, prefs.CustomPivot, spriteSheetData.Frames);
                     }
 
                     // If we don't do this it won't update the new sprite meta data
                     importer.spriteImportMode = SpriteImportMode.Single;
                     importer.spriteImportMode = SpriteImportMode.Multiple;
 
-                    if (spriteSheetData.Frames > 0)
-                        importer.spritesheet = spriteSheet.Take((int)spriteSheetData.Frames).ToArray();
-                    else
-                        importer.spritesheet = spriteSheet;
+                    importer.spritesheet = spriteSheet;
                 }
                 else if (importer.spritesheet != null && changePivot) // for existing sliced sheets without data in the text file and wantint to change pivot
-				{
-					var spriteSheet = new SpriteMetaData[importer.spritesheet.Length];
-					
-					for (int i = 0; i < importer.spritesheet.Length; i++)
-					{
-						var spriteMetaData = importer.spritesheet[i];
-						spriteMetaData.alignment = (int)prefs.Pivot;
-						spriteMetaData.pivot = prefs.CustomPivot;
-						spriteSheet[i] = spriteMetaData;
-					}
-					
-					importer.spritesheet = spriteSheet;
-				}
-				else
+                {
+                    var spriteSheet = new SpriteMetaData[importer.spritesheet.Length];
+                    
+                    for (int i = 0; i < importer.spritesheet.Length; i++)
+                    {
+                        var spriteMetaData = importer.spritesheet[i];
+                        spriteMetaData.alignment = (int)prefs.Pivot;
+                        spriteMetaData.pivot = prefs.CustomPivot;
+                        spriteSheet[i] = spriteMetaData;
+                    }
+                    
+                    importer.spritesheet = spriteSheet;
+                }
+                else
                     importer.spriteImportMode = SpriteImportMode.Single;
 
                 TextureImporterSettings settings = new TextureImporterSettings();

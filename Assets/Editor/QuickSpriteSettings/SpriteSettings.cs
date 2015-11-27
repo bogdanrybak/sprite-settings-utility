@@ -35,6 +35,14 @@ namespace Staple.EditorScripts
         public string SpritesheetDataFile = "_spritesheets.txt";
 
 		public bool PackOnApply = false;
+
+		public GridSlicingMode GridSlicing;
+
+		public enum GridSlicingMode
+		{
+			Default,
+			SliceAll,
+		};
     }
 
     [CustomPropertyDrawer(typeof(SpriteSettings))]

@@ -1,0 +1,247 @@
+fileFormatVersion: 2
+guid: 8807b8fd09ddf4ca9a74248215dd4953
+timeCreated: 1448663049
+licenseType: Pro
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: ultimate_powerup_0
+    21300002: ultimate_powerup_1
+    21300004: ultimate_powerup_2
+    21300006: ultimate_powerup_3
+    21300008: ultimate_powerup_4
+    21300010: ultimate_powerup_5
+    21300012: ultimate_powerup_6
+    21300014: ultimate_powerup_7
+    21300016: ultimate_powerup_8
+    21300018: ultimate_powerup_9
+    21300020: ultimate_powerup_10
+    21300022: ultimate_powerup_11
+    21300024: ultimate_powerup_12
+    21300026: ultimate_powerup_13
+    21300028: ultimate_powerup_14
+    21300030: Expected80x80_0
+    21300032: Expected80x80_1
+    21300034: Expected80x80_2
+    21300036: Expected80x80_3
+    21300038: Expected80x80_4
+    21300040: Expected80x80_5
+    21300042: Expected80x80_6
+    21300044: Expected80x80_7
+    21300046: Expected80x80_8
+    21300048: Expected80x80_9
+    21300050: Expected80x80_10
+    21300052: Expected80x80_11
+    21300054: Expected80x80_12
+    21300056: Expected80x80_13
+    21300058: Expected80x80_14
+    21300060: Expected80x80_15
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -3
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: 0
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 7
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 50
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: Expected80x80_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 264
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_1
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 264
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_2
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 264
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_3
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 264
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 184
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_5
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 184
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_6
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 184
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_7
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 184
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 104
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_9
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 104
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_10
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 104
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_11
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 104
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_12
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 24
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_13
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 24
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_14
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 24
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Expected80x80_15
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 24
+        width: 80
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

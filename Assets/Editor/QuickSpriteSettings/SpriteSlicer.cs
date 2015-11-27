@@ -28,11 +28,12 @@ namespace Staple.EditorScripts
         {
             int numSpritesTall = Mathf.FloorToInt (texture.height / cellSize.y);
             int numSpritesWide = Mathf.FloorToInt (texture.width / cellSize.x);
+            float remainderY = texture.height - (numSpritesTall * cellSize.y);
             int i = 0;
             Rect[] rects = new Rect[numSpritesWide * numSpritesTall];
             for (int y = numSpritesTall - 1; y >= 0; y--) {
                 for (int x = 0; x < numSpritesWide; x++) {
-                    Rect rect = new Rect (x * cellSize.x, y * cellSize.y, cellSize.x, cellSize.y);
+                    Rect rect = new Rect (x * cellSize.x, y * cellSize.y + remainderY, cellSize.x, cellSize.y);
                     rects[i++] = rect;
                 }
             }

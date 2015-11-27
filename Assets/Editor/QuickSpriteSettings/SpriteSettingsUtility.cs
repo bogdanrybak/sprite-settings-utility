@@ -13,7 +13,7 @@ namespace Staple.EditorScripts
     public class SpriteSettingsUtility
     {
         public static void ApplyDefaultTextureSettings(
-            SpriteSettings prefs, SpriteSlicingOptions slicingOptions,
+            SpriteSettings prefs,
             bool changePivot,
             bool changePackingTag)
         {
@@ -27,6 +27,8 @@ namespace Staple.EditorScripts
 
                 var importer = AssetImporter.GetAtPath(path) as TextureImporter;
                 if (importer == null) continue;
+                
+                var slicingOptions = GetSlicingOptions (path, prefs.SpritesheetDataFile);
                 
                 // When we have text file data
                 if (slicingOptions.CellSize != Vector2.zero)
@@ -98,7 +100,7 @@ namespace Staple.EditorScripts
         }
 
 
-        public static SpriteSlicingOptions GetSlicingOptions(string path, string dataFileName)
+        public static SpriteSlicingOptions  GetSlicingOptions(string path, string dataFileName)
         {
             var spriteSheetDataFile = AssetDatabase.LoadAssetAtPath(
                 Path.GetDirectoryName(path) + "/" + dataFileName, typeof(TextAsset)

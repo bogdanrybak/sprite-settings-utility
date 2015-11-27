@@ -56,6 +56,51 @@ namespace Staple.EditorScripts
         {
             LoadSlicingOptions ();
         }
+        
+        void LoadSlicingOptions ()
+        {
+            if (currentSelectedSettings == null) 
+            {
+                return;
+            }
+            
+            // No need to load with multiple selections without multiobject support
+            if (Selection.objects.Length > 1)
+            {
+                return;
+            }
+            
+            if (!IsObjectValidTexture (Selection.activeObject))
+            {
+                return;
+            }
+            
+            slicingOptions = LoadSlicingOptionForObject (Selection.activeObject);
+            slicingOptionsLoaded = true;
+        }
+        
+        SpriteSlicingOptions LoadSlicingOptionForObject (Object obj)
+        {
+            string path = AssetDatabase.GetAssetPath(obj);
+            return SpriteSettingsUtility.GetSlicingOptions(path, currentSelectedSettings.SpritesheetDataFile);
+        }
+        
+        bool IsObjectValidTexture (Object obj)
+        {
+            if (!AssetDatabase.Contains(obj))
+            {
+                return false;
+            }
+            
+            string path = AssetDatabase.GetAssetPath(obj);
+            var asset = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+            if (asset == null)
+            {
+                return false;
+            }
+            
+            return true;
+        }
 
         void OnInspectorUpdate()
         {
@@ -85,8 +130,6 @@ namespace Staple.EditorScripts
             EditorGUILayout.Space();
 
             bodyScrollPos = EditorGUILayout.BeginScrollView(bodyScrollPos);
-
-            DrawSelectedTextureInfo();
             
             if (!slicingOptionsLoaded) {
                 LoadSlicingOptions ();
@@ -103,8 +146,7 @@ namespace Staple.EditorScripts
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("Apply"))
             {
-                SpriteSettingsUtility.ApplyDefaultTextureSettings(currentSelectedSettings, slicingOptions, 
-                    changePivot, changePackingTag);
+                SpriteSettingsUtility.ApplyDefaultTextureSettings(currentSelectedSettings, changePivot, changePackingTag);
                 
                 if (currentSelectedSettings.PackOnApply)
                 {
@@ -213,64 +255,25 @@ namespace Staple.EditorScripts
             
             EditorGUILayout.EndToggleGroup();
         }
-
-        void DrawSelectedTextureInfo()
-        {
-            if (Selection.objects.Length > 0)
-            {
-                EditorGUILayout.LabelField("Selected textures");
-                EditorGUILayout.Space();
-
-                Color defaultColor = GUI.color;
-                GUI.color = Color.yellow;
-
-                foreach (var obj in Selection.objects)
-                {
-                    if (!AssetDatabase.Contains(obj)) continue;
-
-                    string path = AssetDatabase.GetAssetPath(obj);
-
-                    var asset = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
-                    if (asset == null) continue;
-
-                    string metaData = "";
-
-                    var previewSlicingOptions = SpriteSettingsUtility.GetSlicingOptions(path, currentSelectedSettings.SpritesheetDataFile);
-                    metaData = " " + previewSlicingOptions.CellSize + ", " + previewSlicingOptions.Frames + " frames";
-
-                    EditorGUILayout.LabelField(path + metaData);
-                }
-
-                GUI.color = defaultColor;
-            }
-        }
-        
-        void LoadSlicingOptions ()
-        {
-            if (currentSelectedSettings == null) 
-            {
-                return;
-            }
-            
-            foreach (var obj in Selection.objects)
-            {
-                if (!AssetDatabase.Contains(obj)) continue;
-
-                string path = AssetDatabase.GetAssetPath(obj);
-
-                var asset = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
-                if (asset == null) continue;
-
-                slicingOptions = SpriteSettingsUtility.GetSlicingOptions(path, currentSelectedSettings.SpritesheetDataFile);
-                break;
-            }
-            
-            slicingOptionsLoaded = true;
-        }
         
         void DrawSlicingOptions ()
         {
             EditorGUILayout.LabelField ("Slicing Options", EditorStyles.boldLabel);
+            if (Selection.objects.Length > 1)
+            {
+                string slicingInfo = "";
+                foreach (var obj in Selection.objects)
+                {
+                    if (IsObjectValidTexture (obj))
+                    {
+                        slicingOptions = LoadSlicingOptionForObject (obj);
+                        slicingInfo += "\n" + obj.name + ": " + slicingOptions.ToDisplayString ();
+                    }
+                }
+                EditorGUILayout.HelpBox ("Slicing Options does not support Multiple-Object editing. "
+                    + " The following settings will be used:\n" + slicingInfo, MessageType.Info);
+                return;
+            }
             
             slicingOptions.SlicingMode = (SpriteSlicingOptions.GridSlicingMode) 
                 EditorGUILayout.EnumPopup ("Slicing Mode", slicingOptions.SlicingMode);

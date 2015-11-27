@@ -12,9 +12,20 @@ public struct SpriteSlicingOptions
 
     public enum GridSlicingMode
     {
-        Default,
+        Bogdan,
         SliceAll,
     };
+    
+    public string ToDisplayString ()
+    {
+        if (CellSize == Vector2.zero) 
+        {
+            return "Default Settings";
+        }
+        
+        var displayString = string.Concat ("Cell Size: ", CellSize.x, ",", CellSize.y, " Frames: ", Frames );
+        return displayString;
+    }
     
     public override string ToString ()
     {

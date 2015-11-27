@@ -127,12 +127,12 @@ namespace Staple.EditorScripts
             string textAssetPath = Path.GetDirectoryName(path) + "/" + dataFileName;
             var spriteSheetDataFile = AssetDatabase.LoadAssetAtPath(textAssetPath, typeof(TextAsset)) as TextAsset;
             
-            string newEntry = string.Concat ("\n", key, ", ", slicingOptions.ToString ());
+            string newEntry = string.Concat (key, ", ", slicingOptions.ToString ());
             
             // Create new file if none exists
             if (spriteSheetDataFile == null) 
             {
-                File.WriteAllText (path, newEntry);
+                File.WriteAllText (textAssetPath, newEntry);
             } else
             {
                 string existing = File.ReadAllText (textAssetPath);
@@ -150,11 +150,15 @@ namespace Staple.EditorScripts
                     File.WriteAllLines (textAssetPath, entries);
                 } else 
                 {
-                    File.AppendAllText (textAssetPath, newEntry);
+                    File.AppendAllText (textAssetPath, "\n" + newEntry);
                 }
             }
             
-            EditorUtility.SetDirty(spriteSheetDataFile);
+            AssetDatabase.ImportAsset(textAssetPath, ImportAssetOptions.ForceUpdate);
+            if (spriteSheetDataFile != null)
+            {
+                EditorUtility.SetDirty(spriteSheetDataFile);
+            }
         }
     }
 }

@@ -26,4 +26,17 @@ MonoBehaviour:
     MaxSize: 2048
     SpritesheetDataFile: _spritesheets.txt
     PackOnApply: 0
-    GridSlicing: 0
+  - Name: Uncompressed
+    PixelsPerUnit: 1
+    PackingTag: 
+    Pivot: 0
+    CustomPivot: {x: 0, y: 0}
+    SpriteMeshType: 1
+    ExtrudeEdges: 1
+    GenerateMipMaps: 0
+    FilterMode: 0
+    WrapMode: 1
+    TextureFormat: 4
+    MaxSize: 2048
+    SpritesheetDataFile: _spritesheets.txt
+    PackOnApply: 0

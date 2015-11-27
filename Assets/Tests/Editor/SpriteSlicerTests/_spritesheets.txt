@@ -1,1 +1,0 @@
-SampleTexture 1.png, 86, 86, 1000

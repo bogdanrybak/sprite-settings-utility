@@ -88,6 +88,7 @@ namespace Staple.EditorScripts
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
 #endif
             EditorUtility.SetDirty(texture);
+            WriteSlicingOptions (path, prefs.SpritesheetDataFile, texture.name + ".png", slicingOptions);
         }
 
 
@@ -111,21 +112,49 @@ namespace Staple.EditorScripts
 
                 if (!string.IsNullOrEmpty(entry))
                 {
-                    try {
-                        // Strip filename
-                        int firstIndex = entry.IndexOf (',') + 1;
-                        int lastIndex = entry.Length - 1;
-                        var slicingData = entry.Substring (firstIndex, lastIndex - firstIndex);
-                        return SpriteSlicingOptions.FromString (slicingData);
-                    }
-                    catch
-                    {
-                        Debug.LogError("Invalid sprite data at line: " + Array.IndexOf(entries, entry) + ", (" + entry + ")");
-                    }
+                    // Strip filename
+                    int firstIndex = entry.IndexOf (',') + 1;
+                    int lastIndex = entry.Length - 1;
+                    var slicingData = entry.Substring (firstIndex, lastIndex - firstIndex + 1);
+                    return SpriteSlicingOptions.FromString (slicingData);
                 }
             }
 
             return new SpriteSlicingOptions ();
+        }
+        public static void WriteSlicingOptions(string path, string dataFileName, string key, SpriteSlicingOptions slicingOptions)
+        {
+            string textAssetPath = Path.GetDirectoryName(path) + "/" + dataFileName;
+            var spriteSheetDataFile = AssetDatabase.LoadAssetAtPath(textAssetPath, typeof(TextAsset)) as TextAsset;
+            
+            string newEntry = string.Concat ("\n", key, ", ", slicingOptions.ToString ());
+            
+            // Create new file if none exists
+            if (spriteSheetDataFile == null) 
+            {
+                File.WriteAllText (path, newEntry);
+            } else
+            {
+                string existing = File.ReadAllText (textAssetPath);
+                if (existing.Contains (key))
+                {
+                    string[] entries = spriteSheetDataFile.text.Split(
+                        new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 0; i < entries.Length; i++)
+                    {
+                        if (entries[i].Contains(key))
+                        {
+                            entries[i] = newEntry;
+                        }
+                    }
+                    File.WriteAllLines (textAssetPath, entries);
+                } else 
+                {
+                    File.AppendAllText (textAssetPath, newEntry);
+                }
+            }
+            
+            EditorUtility.SetDirty(spriteSheetDataFile);
         }
     }
 }

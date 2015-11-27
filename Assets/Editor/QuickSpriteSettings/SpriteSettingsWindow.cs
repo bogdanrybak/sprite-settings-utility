@@ -189,9 +189,11 @@ namespace Staple.EditorScripts
                 {
                     if (IsObjectValidTexture (obj))
                     {
+                        // Load existing options for multi-select. Otherwise use recent settings
+                        SpriteSlicingOptions options = Selection.objects.Length == 1 ? slicingOptions :
+                            LoadSlicingOptionForObject (obj);
                         SpriteSettingsUtility.ApplyDefaultTextureSettings((Texture2D) obj,
-                            currentSelectedSettings, LoadSlicingOptionForObject (obj), 
-                            changePivot, changePackingTag);
+                            currentSelectedSettings, options, changePivot, changePackingTag);
                     }
                 }
                 

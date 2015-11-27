@@ -64,6 +64,11 @@ namespace Staple.EditorScripts
                 return;
             }
             
+            if (Selection.objects.Length == 0)
+            {
+                return;
+            }
+            
             // No need to load with multiple selections without multiobject support
             if (Selection.objects.Length > 1)
             {
@@ -113,6 +118,18 @@ namespace Staple.EditorScripts
                 DrawEmptySaveSettings ();
                 return;
             }
+            
+            if (Selection.objects.Length == 0)
+            {
+                DrawNoSelection ();
+                return;
+            }
+            
+            if (!AtLeastOneTextureIsSelected ())
+            {
+                DrawSelectionNotTexture ();
+                return;
+            }
 
             EditorGUILayout.BeginVertical(EditorStyles.inspectorFullWidthMargins);
             EditorGUILayout.Space();
@@ -139,6 +156,28 @@ namespace Staple.EditorScripts
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
         }
+        
+        void DrawNoSelection ()
+        {
+            EditorGUILayout.HelpBox ("No texture is selected. Select a texture to apply saved settings.", MessageType.Warning);
+        }
+        
+        bool AtLeastOneTextureIsSelected ()
+        {
+            foreach (var obj in Selection.objects)
+            {
+                if (IsObjectValidTexture (obj))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        void DrawSelectionNotTexture ()
+        {
+            EditorGUILayout.HelpBox ("None of the selected objects are textures. Select at least one texture" + 
+                "to apply saved settings.", MessageType.Warning);
+        }
 
         void DrawApplyButton()
         {
@@ -146,7 +185,15 @@ namespace Staple.EditorScripts
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("Apply"))
             {
-                SpriteSettingsUtility.ApplyDefaultTextureSettings(currentSelectedSettings, changePivot, changePackingTag);
+                foreach (var obj in Selection.objects)
+                {
+                    if (IsObjectValidTexture (obj))
+                    {
+                        SpriteSettingsUtility.ApplyDefaultTextureSettings((Texture2D) obj,
+                            currentSelectedSettings, LoadSlicingOptionForObject (obj), 
+                            changePivot, changePackingTag);
+                    }
+                }
                 
                 if (currentSelectedSettings.PackOnApply)
                 {

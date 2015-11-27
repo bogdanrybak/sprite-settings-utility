@@ -36,13 +36,7 @@ namespace Staple.EditorScripts
 
 		public bool PackOnApply = false;
 
-		public GridSlicingMode GridSlicing;
-
-		public enum GridSlicingMode
-		{
-			Default,
-			SliceAll,
-		};
+		public SpriteSlicingOptions SlicingOptions;
     }
 
     [CustomPropertyDrawer(typeof(SpriteSettings))]

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using NUnit.Framework;
+using Staple.EditorScripts;
 
 [TestFixture]
 [Category("SpriteSlicer Tests")]

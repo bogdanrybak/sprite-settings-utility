@@ -12,12 +12,6 @@ namespace Staple.EditorScripts
 {
     public class SpriteSettingsUtility
     {
-        public class SpriteSheetData
-        {
-            public Vector2 Size;
-            public uint Frames;
-        }
-
         public static void ApplyDefaultTextureSettings(
             SpriteSettings prefs, SpriteSlicingOptions slicingOptions,
             bool changePivot,
@@ -33,20 +27,17 @@ namespace Staple.EditorScripts
 
                 var importer = AssetImporter.GetAtPath(path) as TextureImporter;
                 if (importer == null) continue;
-
-                // Try to slice it
-                SpriteSheetData spriteSheetData = GetSpriteData(path, prefs.SpritesheetDataFile);
                 
                 // When we have text file data
-                if (spriteSheetData != null)
+                if (slicingOptions.CellSize != Vector2.zero)
                 {
                     SpriteMetaData[] spriteSheet;
                     if (slicingOptions.SlicingMode == SpriteSlicingOptions.GridSlicingMode.SliceAll) {
                         spriteSheet = SpriteSlicer.CreateSpriteSheetForTexture (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
-                            spriteSheetData.Size, prefs.Pivot);
+                            slicingOptions.CellSize, prefs.Pivot);
                     } else {
                         spriteSheet = SpriteSlicer.CreateSpriteSheetForTextureBogdan (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
-                            spriteSheetData.Size, changePivot, prefs.Pivot, prefs.CustomPivot, spriteSheetData.Frames);
+                            slicingOptions.CellSize, changePivot, prefs.Pivot, prefs.CustomPivot, (uint)slicingOptions.Frames);
                     }
 
                     // If we don't do this it won't update the new sprite meta data
@@ -107,41 +98,32 @@ namespace Staple.EditorScripts
         }
 
 
-        public static SpriteSheetData GetSpriteData(string path, string dataFileName)
+        public static SpriteSlicingOptions GetSlicingOptions(string path, string dataFileName)
         {
             var spriteSheetDataFile = AssetDatabase.LoadAssetAtPath(
                 Path.GetDirectoryName(path) + "/" + dataFileName, typeof(TextAsset)
                 ) as TextAsset;
 
-            return GetSpriteData(path, spriteSheetDataFile);
+            return GetSlicingOptions(path, spriteSheetDataFile);
         }
 
-        public static SpriteSheetData GetSpriteData(string path, TextAsset spriteSheetDataFile)
+        public static SpriteSlicingOptions GetSlicingOptions(string path, TextAsset slicingOptionsDataFile)
         {
-            if (spriteSheetDataFile != null)
+            if (slicingOptionsDataFile != null)
             {
-                string[] entries = spriteSheetDataFile.text.Split(
+                string[] entries = slicingOptionsDataFile.text.Split(
                     new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
 
                 string entry = entries.FirstOrDefault(x => x.StartsWith(Path.GetFileName(path)));
 
                 if (!string.IsNullOrEmpty(entry))
                 {
-                    string[] entryData = entry.Split(',');
-                    var data = new SpriteSheetData();
-                    try
-                    {
-                        float width = int.Parse(entryData[1]);
-                        float height = int.Parse(entryData[2]);
-                        data.Size = new Vector2(width, height);
-
-                        // number of frames is optional
-                        uint frames = 0;
-                        if (entryData.Length > 3)
-                            if (uint.TryParse(entryData[3], out frames))
-                                data.Frames = frames;
-
-                        return data;
+                    try {
+                        // Strip filename
+                        int firstIndex = entry.IndexOf (',') + 1;
+                        int lastIndex = entry.Length - 1;
+                        var slicingData = entry.Substring (firstIndex, lastIndex - firstIndex);
+                        return SpriteSlicingOptions.FromString (slicingData);
                     }
                     catch
                     {
@@ -150,7 +132,7 @@ namespace Staple.EditorScripts
                 }
             }
 
-            return null;
+            return new SpriteSlicingOptions ();
         }
     }
 }

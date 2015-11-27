@@ -38,10 +38,23 @@ namespace Staple.EditorScripts
         private Vector2 bodyScrollPos;
         SpriteSettingsConfigWindow configWindow;
         SpriteSlicingOptions slicingOptions;
+        bool slicingOptionsLoaded = false;
 
         void OnEnable()
         {
             config = AssetDatabase.LoadAssetAtPath(GetPathToConfig (), typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
+            LoadSlicingOptions ();
+            Selection.selectionChanged += HandleSelectionChanged;
+        }
+        
+        void OnDisable()
+        {
+            Selection.selectionChanged -= HandleSelectionChanged;
+        }
+        
+        void HandleSelectionChanged ()
+        {
+            LoadSlicingOptions ();
         }
 
         void OnInspectorUpdate()
@@ -75,6 +88,9 @@ namespace Staple.EditorScripts
 
             DrawSelectedTextureInfo();
             
+            if (!slicingOptionsLoaded) {
+                LoadSlicingOptions ();
+            }
             DrawSlicingOptions ();
 
             EditorGUILayout.EndScrollView();
@@ -219,17 +235,37 @@ namespace Staple.EditorScripts
 
                     string metaData = "";
 
-                    var spriteSheetData = SpriteSettingsUtility.GetSpriteData(path, currentSelectedSettings.SpritesheetDataFile);
-                    if (spriteSheetData != null)
-                    {
-                        metaData = " " + spriteSheetData.Size + ", " + spriteSheetData.Frames + " frames";
-                    }
+                    var previewSlicingOptions = SpriteSettingsUtility.GetSlicingOptions(path, currentSelectedSettings.SpritesheetDataFile);
+                    metaData = " " + previewSlicingOptions.CellSize + ", " + previewSlicingOptions.Frames + " frames";
 
                     EditorGUILayout.LabelField(path + metaData);
                 }
 
                 GUI.color = defaultColor;
             }
+        }
+        
+        void LoadSlicingOptions ()
+        {
+            if (currentSelectedSettings == null) 
+            {
+                return;
+            }
+            
+            foreach (var obj in Selection.objects)
+            {
+                if (!AssetDatabase.Contains(obj)) continue;
+
+                string path = AssetDatabase.GetAssetPath(obj);
+
+                var asset = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+                if (asset == null) continue;
+
+                slicingOptions = SpriteSettingsUtility.GetSlicingOptions(path, currentSelectedSettings.SpritesheetDataFile);
+                break;
+            }
+            
+            slicingOptionsLoaded = true;
         }
         
         void DrawSlicingOptions ()
@@ -247,6 +283,8 @@ namespace Staple.EditorScripts
             EditorGUI.BeginDisabledGroup (!enableCustomPivot);
             slicingOptions.CustomPivot = EditorGUILayout.Vector2Field ("Custom Pivot", slicingOptions.CustomPivot);
             EditorGUI.EndDisabledGroup ();
+            
+            slicingOptions.Frames = EditorGUILayout.IntField ("Frames", slicingOptions.Frames);
         }
     }
 }

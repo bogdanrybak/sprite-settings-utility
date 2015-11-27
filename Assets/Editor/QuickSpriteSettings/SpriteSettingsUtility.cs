@@ -19,7 +19,7 @@ namespace Staple.EditorScripts
         }
 
         public static void ApplyDefaultTextureSettings(
-            SpriteSettings prefs,
+            SpriteSettings prefs, SpriteSlicingOptions slicingOptions,
             bool changePivot,
             bool changePackingTag)
         {
@@ -41,7 +41,7 @@ namespace Staple.EditorScripts
                 if (spriteSheetData != null)
                 {
                     SpriteMetaData[] spriteSheet;
-                    if (prefs.SlicingOptions.SlicingMode == SpriteSlicingOptions.GridSlicingMode.SliceAll) {
+                    if (slicingOptions.SlicingMode == SpriteSlicingOptions.GridSlicingMode.SliceAll) {
                         spriteSheet = SpriteSlicer.CreateSpriteSheetForTexture (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
                             spriteSheetData.Size, prefs.Pivot);
                     } else {

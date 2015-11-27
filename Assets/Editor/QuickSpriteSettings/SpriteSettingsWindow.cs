@@ -37,6 +37,7 @@ namespace Staple.EditorScripts
         private SpriteSettingsConfig config;
         private Vector2 bodyScrollPos;
         SpriteSettingsConfigWindow configWindow;
+        SpriteSlicingOptions slicingOptions;
 
         void OnEnable()
         {
@@ -73,6 +74,8 @@ namespace Staple.EditorScripts
             bodyScrollPos = EditorGUILayout.BeginScrollView(bodyScrollPos);
 
             DrawSelectedTextureInfo();
+            
+            DrawSlicingOptions ();
 
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
@@ -84,13 +87,14 @@ namespace Staple.EditorScripts
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("Apply"))
             {
-                SpriteSettingsUtility.ApplyDefaultTextureSettings(currentSelectedSettings, changePivot, changePackingTag);
+                SpriteSettingsUtility.ApplyDefaultTextureSettings(currentSelectedSettings, slicingOptions, 
+                    changePivot, changePackingTag);
                 
-				if (currentSelectedSettings.PackOnApply)
-				{
-                	UnityEditor.Sprites.Packer.RebuildAtlasCacheIfNeeded(
-                	EditorUserBuildSettings.activeBuildTarget, true);
-				}
+                if (currentSelectedSettings.PackOnApply)
+                {
+                    UnityEditor.Sprites.Packer.RebuildAtlasCacheIfNeeded(
+                    EditorUserBuildSettings.activeBuildTarget, true);
+                }
                 
                 Close();
                 if (configWindow != null) 
@@ -135,9 +139,9 @@ namespace Staple.EditorScripts
         
         void ShowConfigWindow (int indexToFocus)
         {
-                configWindow = EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
-                configWindow.SetConfig (config);
-                configWindow.SelectSetting (indexToFocus);
+            configWindow = EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
+            configWindow.SetConfig (config);
+            configWindow.SelectSetting (indexToFocus);
         }
         
         void DrawSaveSettingSelect ()
@@ -226,6 +230,23 @@ namespace Staple.EditorScripts
 
                 GUI.color = defaultColor;
             }
+        }
+        
+        void DrawSlicingOptions ()
+        {
+            EditorGUILayout.LabelField ("Slicing Options", EditorStyles.boldLabel);
+            
+            slicingOptions.SlicingMode = (SpriteSlicingOptions.GridSlicingMode) 
+                EditorGUILayout.EnumPopup ("Slicing Mode", slicingOptions.SlicingMode);
+            
+            slicingOptions.CellSize = EditorGUILayout.Vector2Field ("Cell Size (X/Y)", slicingOptions.CellSize);
+            
+            slicingOptions.Pivot = (SpriteAlignment) EditorGUILayout.EnumPopup ("Pivot", slicingOptions.Pivot);
+            
+            bool enableCustomPivot = slicingOptions.Pivot == SpriteAlignment.Custom;
+            EditorGUI.BeginDisabledGroup (!enableCustomPivot);
+            slicingOptions.CustomPivot = EditorGUILayout.Vector2Field ("Custom Pivot", slicingOptions.CustomPivot);
+            EditorGUI.EndDisabledGroup ();
         }
     }
 }

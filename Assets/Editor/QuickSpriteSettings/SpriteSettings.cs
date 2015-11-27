@@ -35,8 +35,6 @@ namespace Staple.EditorScripts
         public string SpritesheetDataFile = "_spritesheets.txt";
 
 		public bool PackOnApply = false;
-
-		public SpriteSlicingOptions SlicingOptions;
     }
 
     [CustomPropertyDrawer(typeof(SpriteSettings))]

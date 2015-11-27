@@ -112,11 +112,17 @@ namespace Staple.EditorScripts
 
                 if (!string.IsNullOrEmpty(entry))
                 {
-                    // Strip filename
-                    int firstIndex = entry.IndexOf (',') + 1;
-                    int lastIndex = entry.Length - 1;
-                    var slicingData = entry.Substring (firstIndex, lastIndex - firstIndex + 1);
-                    return SpriteSlicingOptions.FromString (slicingData);
+                    try {
+                        // Strip filename
+                        int firstIndex = entry.IndexOf (',') + 1;
+                        int lastIndex = entry.Length - 1;
+                        var slicingData = entry.Substring (firstIndex, lastIndex - firstIndex + 1);
+                        return SpriteSlicingOptions.FromString (slicingData);
+                    } catch (SystemException e)
+                    {
+                        Debug.LogError (string.Format ("Encountered error in saved slicing options file. Entry: " + entry
+                            + "\n Error: " + e));
+                    }
                 }
             }
 

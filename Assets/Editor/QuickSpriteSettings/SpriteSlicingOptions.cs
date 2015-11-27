@@ -3,14 +3,15 @@
 [System.Serializable]
 public struct SpriteSlicingOptions
 {
-    public GridSlicingMode SlicingMode;
+    public GridSlicingMethod GridSlicing;
     public Vector2 CellSize;
     public SpriteAlignment Pivot;
     public Vector2 CustomPivot;
     public int Frames;
+    public UnityEditor.SpriteImportMode SpriteImportMode;
     const char delimeterChar = ',';
 
-    public enum GridSlicingMode
+    public enum GridSlicingMethod
     {
         Bogdan,
         SliceAll,
@@ -31,8 +32,8 @@ public struct SpriteSlicingOptions
     {
         string delimeterSpace = delimeterChar + " ";
         string serialized = string.Concat (CellSize.x, delimeterSpace, CellSize.y, delimeterSpace, Frames,
-            delimeterSpace, (int)SlicingMode, delimeterSpace, (int) Pivot, delimeterSpace,
-            CustomPivot.x, delimeterSpace, CustomPivot.y);
+            delimeterSpace, (int) SpriteImportMode, delimeterSpace, (int)GridSlicing, delimeterSpace,
+            (int) Pivot, delimeterSpace, CustomPivot.x, delimeterSpace, CustomPivot.y);
         return serialized;
     }
     
@@ -44,11 +45,12 @@ public struct SpriteSlicingOptions
         if (entries.Length >= 3)
         {
             int.TryParse (entries[2], out options.Frames);
-            if (entries.Length >= 7)
+            if (entries.Length >= 8)
             {
-                options.SlicingMode = (GridSlicingMode) int.Parse (entries[3]);
-                options.Pivot = (SpriteAlignment) int.Parse (entries[4]);
-                options.CustomPivot = new Vector2 (int.Parse (entries[5]), int.Parse (entries[6]));
+                options.SpriteImportMode = (UnityEditor.SpriteImportMode) int.Parse (entries[3]);
+                options.GridSlicing = (GridSlicingMethod) int.Parse (entries[4]);
+                options.Pivot = (SpriteAlignment) int.Parse (entries[5]);
+                options.CustomPivot = new Vector2 (int.Parse (entries[6]), int.Parse (entries[7]));
             }
         }
        

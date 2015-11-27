@@ -324,8 +324,16 @@ namespace Staple.EditorScripts
                 return;
             }
             
-            slicingOptions.SlicingMode = (SpriteSlicingOptions.GridSlicingMode) 
-                EditorGUILayout.EnumPopup ("Slicing Mode", slicingOptions.SlicingMode);
+            slicingOptions.SpriteImportMode = (SpriteImportMode) EditorGUILayout.EnumPopup 
+                ("Sprite Import Mode", slicingOptions.SpriteImportMode);
+            
+            if (slicingOptions.SpriteImportMode != SpriteImportMode.Multiple)
+            {
+                return;
+            }
+            
+            slicingOptions.GridSlicing = (SpriteSlicingOptions.GridSlicingMethod) 
+                EditorGUILayout.EnumPopup ("Grid Slicing Method", slicingOptions.GridSlicing);
             
             slicingOptions.CellSize = EditorGUILayout.Vector2Field ("Cell Size (X/Y)", slicingOptions.CellSize);
             

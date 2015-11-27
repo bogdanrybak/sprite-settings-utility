@@ -23,10 +23,10 @@ namespace Staple.EditorScripts
             var importer = AssetImporter.GetAtPath(path) as TextureImporter;
             
             // When we have text file data
-            if (slicingOptions.CellSize != Vector2.zero)
+            if (slicingOptions.SpriteImportMode == SpriteImportMode.Multiple)
             {
                 SpriteMetaData[] spriteSheet;
-                if (slicingOptions.SlicingMode == SpriteSlicingOptions.GridSlicingMode.SliceAll) {
+                if (slicingOptions.GridSlicing == SpriteSlicingOptions.GridSlicingMethod.SliceAll) {
                     spriteSheet = SpriteSlicer.CreateSpriteSheetForTexture (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
                         slicingOptions.CellSize, prefs.Pivot);
                 } else {
@@ -40,22 +40,17 @@ namespace Staple.EditorScripts
 
                 importer.spritesheet = spriteSheet;
             }
-            else if (importer.spritesheet != null && changePivot) // for existing sliced sheets without data in the text file and wantint to change pivot
+            else if (slicingOptions.SpriteImportMode == SpriteImportMode.Single) 
             {
-                var spriteSheet = new SpriteMetaData[importer.spritesheet.Length];
-                
-                for (int i = 0; i < importer.spritesheet.Length; i++)
-                {
-                    var spriteMetaData = importer.spritesheet[i];
-                    spriteMetaData.alignment = (int)prefs.Pivot;
-                    spriteMetaData.pivot = prefs.CustomPivot;
-                    spriteSheet[i] = spriteMetaData;
-                }
-                
-                importer.spritesheet = spriteSheet;
-            }
-            else
                 importer.spriteImportMode = SpriteImportMode.Single;
+            } else if (slicingOptions.SpriteImportMode == SpriteImportMode.None)
+            {
+                // Do nothing for None mode for now.
+            } else
+            {
+                throw new System.NotSupportedException ("Encountered unsupported SpriteImportMode:" 
+                    + importer.spriteImportMode);
+            }
 
             TextureImporterSettings settings = new TextureImporterSettings();
             importer.ReadTextureSettings(settings);

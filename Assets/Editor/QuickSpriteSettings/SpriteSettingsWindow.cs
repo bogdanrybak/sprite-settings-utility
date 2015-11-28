@@ -343,11 +343,13 @@ namespace Staple.EditorScripts
             if (slicingOptions.ImportMode != SpriteImportMode.None)
             {
                 changePivot = EditorGUILayout.BeginToggleGroup("Override Pivot", changePivot);
-                slicingOptions.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(slicingOptions.Pivot);
+                var pivotToUse = changePivot ? slicingOptions.Pivot : currentSelectedSettings.Pivot;
+                slicingOptions.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(pivotToUse);
     
                 bool showCustomPivot = slicingOptions.Pivot == SpriteAlignment.Custom;
                 EditorGUI.BeginDisabledGroup (!showCustomPivot);
-                slicingOptions.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", slicingOptions.CustomPivot);
+                var customPivotToUse = changePivot ? slicingOptions.CustomPivot : currentSelectedSettings.CustomPivot;
+                slicingOptions.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", customPivotToUse);
                 EditorGUI.EndDisabledGroup ();
                 EditorGUILayout.EndToggleGroup();
             }

@@ -32,7 +32,7 @@ namespace Staple.EditorScripts
                 SpriteMetaData[] spriteSheet;
                 if (slicingOptions.GridSlicing == SpriteSlicingOptions.GridSlicingMethod.SliceAll) {
                     spriteSheet = SpriteSlicer.CreateSpriteSheetForTexture (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
-                        slicingOptions.CellSize, prefs.Pivot);
+                        slicingOptions.CellSize, slicingOptions.Pivot, slicingOptions.CustomPivot);
                 } else {
                     spriteSheet = SpriteSlicer.CreateSpriteSheetForTextureBogdan (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
                         slicingOptions.CellSize, changePivot, prefs.Pivot, prefs.CustomPivot, (uint)slicingOptions.Frames);

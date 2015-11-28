@@ -51,7 +51,7 @@ public struct SpriteSlicingOptions
                 options.ImportMode = (SpriteImportMode) int.Parse (entries[3]);
                 options.GridSlicing = (GridSlicingMethod) int.Parse (entries[4]);
                 options.Pivot = (SpriteAlignment) int.Parse (entries[5]);
-                options.CustomPivot = new Vector2 (int.Parse (entries[6]), int.Parse (entries[7]));
+                options.CustomPivot = new Vector2 (float.Parse (entries[6]), float.Parse (entries[7]));
             }
         }
        

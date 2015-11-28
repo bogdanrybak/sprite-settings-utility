@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEditor;
 
 [System.Serializable]
 public struct SpriteSlicingOptions
@@ -8,13 +9,13 @@ public struct SpriteSlicingOptions
     public SpriteAlignment Pivot;
     public Vector2 CustomPivot;
     public int Frames;
-    public UnityEditor.SpriteImportMode SpriteImportMode;
+    public SpriteImportMode ImportMode;
     const char delimeterChar = ',';
 
     public enum GridSlicingMethod
     {
-        Bogdan,
-        SliceAll,
+        Bogdan = 0,
+        SliceAll = 1,
     };
     
     public string ToDisplayString ()
@@ -32,7 +33,7 @@ public struct SpriteSlicingOptions
     {
         string delimeterSpace = delimeterChar + " ";
         string serialized = string.Concat (CellSize.x, delimeterSpace, CellSize.y, delimeterSpace, Frames,
-            delimeterSpace, (int) SpriteImportMode, delimeterSpace, (int)GridSlicing, delimeterSpace,
+            delimeterSpace, (int) ImportMode, delimeterSpace, (int)GridSlicing, delimeterSpace,
             (int) Pivot, delimeterSpace, CustomPivot.x, delimeterSpace, CustomPivot.y);
         return serialized;
     }
@@ -47,7 +48,7 @@ public struct SpriteSlicingOptions
             int.TryParse (entries[2], out options.Frames);
             if (entries.Length >= 8)
             {
-                options.SpriteImportMode = (UnityEditor.SpriteImportMode) int.Parse (entries[3]);
+                options.ImportMode = (SpriteImportMode) int.Parse (entries[3]);
                 options.GridSlicing = (GridSlicingMethod) int.Parse (entries[4]);
                 options.Pivot = (SpriteAlignment) int.Parse (entries[5]);
                 options.CustomPivot = new Vector2 (int.Parse (entries[6]), int.Parse (entries[7]));
@@ -55,5 +56,17 @@ public struct SpriteSlicingOptions
         }
        
         return options;
+    }
+    
+    public bool IsValid ()
+    {
+        if (ImportMode == SpriteImportMode.Multiple)
+        {
+            if (CellSize.x == 0 || CellSize.y == 0) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 }

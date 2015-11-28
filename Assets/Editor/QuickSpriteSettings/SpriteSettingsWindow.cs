@@ -192,6 +192,11 @@ namespace Staple.EditorScripts
                         // Load existing options for multi-select. Otherwise use recent settings
                         SpriteSlicingOptions options = Selection.objects.Length == 1 ? slicingOptions :
                             LoadSlicingOptionForObject (obj);
+                        if (!options.IsValid ()) {
+                            Debug.LogWarning ("Skipping ApplyingTextureSettings to object due to invalid "
+                                 + "Slicing Options. Object: " + obj.name);
+                            continue;
+                        }
                         SpriteSettingsUtility.ApplyDefaultTextureSettings((Texture2D) obj,
                             currentSelectedSettings, options, changePivot, changePackingTag);
                     }
@@ -324,10 +329,10 @@ namespace Staple.EditorScripts
                 return;
             }
             
-            slicingOptions.SpriteImportMode = (SpriteImportMode) EditorGUILayout.EnumPopup 
-                ("Sprite Import Mode", slicingOptions.SpriteImportMode);
+            slicingOptions.ImportMode = (SpriteImportMode) EditorGUILayout.EnumPopup 
+                ("Sprite Import Mode", slicingOptions.ImportMode);
             
-            if (slicingOptions.SpriteImportMode != SpriteImportMode.Multiple)
+            if (slicingOptions.ImportMode != SpriteImportMode.Multiple)
             {
                 return;
             }

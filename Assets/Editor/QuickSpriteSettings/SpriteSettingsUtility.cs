@@ -23,8 +23,12 @@ namespace Staple.EditorScripts
             var importer = AssetImporter.GetAtPath(path) as TextureImporter;
             
             // When we have text file data
-            if (slicingOptions.SpriteImportMode == SpriteImportMode.Multiple)
+            if (slicingOptions.ImportMode == SpriteImportMode.Multiple)
             {
+                // Clamp cellSize to texture width and height
+                slicingOptions.CellSize.x = Mathf.Min (texture.width, slicingOptions.CellSize.x);
+                slicingOptions.CellSize.y = Mathf.Min (texture.height, slicingOptions.CellSize.y);
+                
                 SpriteMetaData[] spriteSheet;
                 if (slicingOptions.GridSlicing == SpriteSlicingOptions.GridSlicingMethod.SliceAll) {
                     spriteSheet = SpriteSlicer.CreateSpriteSheetForTexture (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
@@ -40,10 +44,10 @@ namespace Staple.EditorScripts
 
                 importer.spritesheet = spriteSheet;
             }
-            else if (slicingOptions.SpriteImportMode == SpriteImportMode.Single) 
+            else if (slicingOptions.ImportMode == SpriteImportMode.Single) 
             {
                 importer.spriteImportMode = SpriteImportMode.Single;
-            } else if (slicingOptions.SpriteImportMode == SpriteImportMode.None)
+            } else if (slicingOptions.ImportMode == SpriteImportMode.None)
             {
                 // Do nothing for None mode for now.
             } else

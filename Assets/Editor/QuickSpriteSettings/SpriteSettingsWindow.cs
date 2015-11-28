@@ -130,11 +130,11 @@ namespace Staple.EditorScripts
             
             EditorGUILayout.Space ();
 
+            bodyScrollPos = EditorGUILayout.BeginScrollView(bodyScrollPos);
+
             DrawQuickSettings();
 
             EditorGUILayout.Space();
-
-            bodyScrollPos = EditorGUILayout.BeginScrollView(bodyScrollPos);
             
             if (!slicingOptionsLoaded) {
                 LoadSlicingOptions ();

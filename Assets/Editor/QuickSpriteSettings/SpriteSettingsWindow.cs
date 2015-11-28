@@ -280,17 +280,6 @@ namespace Staple.EditorScripts
 
         void DrawQuickSettings()
         {
-            changePivot = EditorGUILayout.BeginToggleGroup("Apply Pivot", changePivot);
-
-            currentSelectedSettings.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(currentSelectedSettings.Pivot);
-
-            if (currentSelectedSettings.Pivot == SpriteAlignment.Custom)
-                currentSelectedSettings.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", currentSelectedSettings.CustomPivot);
-
-            EditorGUILayout.EndToggleGroup();
-
-            EditorGUILayout.Space();
-
             changePackingTag = EditorGUILayout.BeginToggleGroup("Apply Packing Tag", changePackingTag);
 
             currentSelectedSettings.PackingTag = EditorGUILayout.TextField(currentSelectedSettings.PackingTag);
@@ -312,6 +301,8 @@ namespace Staple.EditorScripts
         
         void DrawSlicingOptions ()
         {
+            EditorGUILayout.Space();
+            
             EditorGUILayout.LabelField ("Slicing Options", EditorStyles.boldLabel);
             if (Selection.objects.Length > 1)
             {
@@ -331,28 +322,35 @@ namespace Staple.EditorScripts
             
             slicingOptions.ImportMode = (SpriteImportMode) EditorGUILayout.EnumPopup 
                 ("Sprite Import Mode", slicingOptions.ImportMode);
+                
+            EditorGUILayout.Space();
             
-            if (slicingOptions.ImportMode != SpriteImportMode.Multiple)
+            if (slicingOptions.ImportMode == SpriteImportMode.Multiple)
             {
-                return;
-            }
-            
-            slicingOptions.GridSlicing = (SpriteSlicingOptions.GridSlicingMethod) 
+                slicingOptions.GridSlicing = (SpriteSlicingOptions.GridSlicingMethod) 
                 EditorGUILayout.EnumPopup ("Grid Slicing Method", slicingOptions.GridSlicing);
             
-            if (slicingOptions.GridSlicing == SpriteSlicingOptions.GridSlicingMethod.Bogdan)
-            {
-                slicingOptions.Frames = EditorGUILayout.IntField ("Frames", slicingOptions.Frames);
+                if (slicingOptions.GridSlicing == SpriteSlicingOptions.GridSlicingMethod.Bogdan)
+                {
+                    slicingOptions.Frames = EditorGUILayout.IntField ("Frames", slicingOptions.Frames);
+                }
+                
+                slicingOptions.CellSize = EditorGUILayout.Vector2Field ("Cell Size (X/Y)", slicingOptions.CellSize);
+                
+                EditorGUILayout.Space();
             }
             
-            slicingOptions.CellSize = EditorGUILayout.Vector2Field ("Cell Size (X/Y)", slicingOptions.CellSize);
-            
-            slicingOptions.Pivot = (SpriteAlignment) EditorGUILayout.EnumPopup ("Pivot", slicingOptions.Pivot);
-            
-            bool enableCustomPivot = slicingOptions.Pivot == SpriteAlignment.Custom;
-            EditorGUI.BeginDisabledGroup (!enableCustomPivot);
-            slicingOptions.CustomPivot = EditorGUILayout.Vector2Field ("Custom Pivot", slicingOptions.CustomPivot);
-            EditorGUI.EndDisabledGroup ();
+            if (slicingOptions.ImportMode != SpriteImportMode.None)
+            {
+                changePivot = EditorGUILayout.BeginToggleGroup("Override Pivot", changePivot);
+                slicingOptions.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(slicingOptions.Pivot);
+    
+                bool showCustomPivot = slicingOptions.Pivot == SpriteAlignment.Custom;
+                EditorGUI.BeginDisabledGroup (!showCustomPivot);
+                slicingOptions.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", slicingOptions.CustomPivot);
+                EditorGUI.EndDisabledGroup ();
+                EditorGUILayout.EndToggleGroup();
+            }
         }
     }
 }

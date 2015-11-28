@@ -340,6 +340,11 @@ namespace Staple.EditorScripts
             slicingOptions.GridSlicing = (SpriteSlicingOptions.GridSlicingMethod) 
                 EditorGUILayout.EnumPopup ("Grid Slicing Method", slicingOptions.GridSlicing);
             
+            if (slicingOptions.GridSlicing == SpriteSlicingOptions.GridSlicingMethod.Bogdan)
+            {
+                slicingOptions.Frames = EditorGUILayout.IntField ("Frames", slicingOptions.Frames);
+            }
+            
             slicingOptions.CellSize = EditorGUILayout.Vector2Field ("Cell Size (X/Y)", slicingOptions.CellSize);
             
             slicingOptions.Pivot = (SpriteAlignment) EditorGUILayout.EnumPopup ("Pivot", slicingOptions.Pivot);
@@ -348,8 +353,6 @@ namespace Staple.EditorScripts
             EditorGUI.BeginDisabledGroup (!enableCustomPivot);
             slicingOptions.CustomPivot = EditorGUILayout.Vector2Field ("Custom Pivot", slicingOptions.CustomPivot);
             EditorGUI.EndDisabledGroup ();
-            
-            slicingOptions.Frames = EditorGUILayout.IntField ("Frames", slicingOptions.Frames);
         }
     }
 }

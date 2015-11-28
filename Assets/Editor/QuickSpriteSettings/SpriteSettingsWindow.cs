@@ -15,18 +15,7 @@ namespace Staple.EditorScripts
         [MenuItem("Assets/Quick Sprite Settings", true)]
         public static bool TextureSelected()
         {
-            foreach (var obj in Selection.objects)
-            {
-                if (!AssetDatabase.Contains(obj)) continue;
-
-                var asset =
-                    AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(obj), typeof(Texture2D)) as Texture2D;
-
-                if (asset != null)
-                    return true;
-            }
-
-            return false;
+            return AtLeastOneTextureIsSelected ();
         }
 
         private SpriteSettings currentSelectedSettings;
@@ -89,7 +78,7 @@ namespace Staple.EditorScripts
             return SpriteSettingsUtility.GetSlicingOptions(path, currentSelectedSettings.SpritesheetDataFile);
         }
         
-        bool IsObjectValidTexture (Object obj)
+        static bool IsObjectValidTexture (Object obj)
         {
             if (!AssetDatabase.Contains(obj))
             {
@@ -161,7 +150,7 @@ namespace Staple.EditorScripts
             EditorGUILayout.HelpBox ("No texture is selected. Select a texture to apply saved settings.", MessageType.Warning);
         }
         
-        bool AtLeastOneTextureIsSelected ()
+        static bool AtLeastOneTextureIsSelected ()
         {
             foreach (var obj in Selection.objects)
             {
@@ -188,7 +177,7 @@ namespace Staple.EditorScripts
                 {
                     if (IsObjectValidTexture (obj))
                     {
-                        // Load existing options for multi-select. Otherwise use recent settings
+                        // Load currently set options for multi-select. Otherwise use saved options
                         SpriteSlicingOptions options = Selection.objects.Length == 1 ? slicingOptions :
                             LoadSlicingOptionForObject (obj);
                         if (!options.IsValid ()) {
@@ -196,7 +185,9 @@ namespace Staple.EditorScripts
                                  + "Slicing Options. Object: " + obj.name);
                             continue;
                         }
-                        SpriteSettingsUtility.ApplyDefaultTextureSettings((Texture2D) obj,
+                        string path = AssetDatabase.GetAssetPath (obj);
+                        var selectedTexture = AssetDatabase.LoadAssetAtPath <Texture2D> (path);
+                        SpriteSettingsUtility.ApplyDefaultTextureSettings(selectedTexture,
                             currentSelectedSettings, options, changePackingTag);
                     }
                 }

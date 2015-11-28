@@ -32,7 +32,6 @@ namespace Staple.EditorScripts
         private SpriteSettings currentSelectedSettings;
         private int selectedSettingIndex;
         private bool showSettings;
-        private bool changePivot = true;
         private bool changePackingTag;
         private SpriteSettingsConfig config;
         private Vector2 bodyScrollPos;
@@ -198,7 +197,7 @@ namespace Staple.EditorScripts
                             continue;
                         }
                         SpriteSettingsUtility.ApplyDefaultTextureSettings((Texture2D) obj,
-                            currentSelectedSettings, options, changePivot, changePackingTag);
+                            currentSelectedSettings, options, changePackingTag);
                     }
                 }
                 
@@ -342,13 +341,13 @@ namespace Staple.EditorScripts
             
             if (slicingOptions.ImportMode != SpriteImportMode.None)
             {
-                changePivot = EditorGUILayout.BeginToggleGroup("Override Pivot", changePivot);
-                var pivotToUse = changePivot ? slicingOptions.Pivot : currentSelectedSettings.Pivot;
+                slicingOptions.OverridePivot = EditorGUILayout.BeginToggleGroup("Override Pivot", slicingOptions.OverridePivot);
+                var pivotToUse = slicingOptions.OverridePivot ? slicingOptions.Pivot : currentSelectedSettings.Pivot;
                 slicingOptions.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(pivotToUse);
     
                 bool showCustomPivot = slicingOptions.Pivot == SpriteAlignment.Custom;
                 EditorGUI.BeginDisabledGroup (!showCustomPivot);
-                var customPivotToUse = changePivot ? slicingOptions.CustomPivot : currentSelectedSettings.CustomPivot;
+                var customPivotToUse = slicingOptions.OverridePivot ? slicingOptions.CustomPivot : currentSelectedSettings.CustomPivot;
                 slicingOptions.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", customPivotToUse);
                 EditorGUI.EndDisabledGroup ();
                 EditorGUILayout.EndToggleGroup();

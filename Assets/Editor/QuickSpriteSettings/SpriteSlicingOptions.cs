@@ -7,6 +7,7 @@ public struct SpriteSlicingOptions
     public GridSlicingMethod GridSlicing;
     public Vector2 CellSize;
     public SpriteAlignment Pivot;
+    public bool OverridePivot;
     public Vector2 CustomPivot;
     public int Frames;
     public SpriteImportMode ImportMode;
@@ -34,7 +35,8 @@ public struct SpriteSlicingOptions
         string delimeterSpace = delimeterChar + " ";
         string serialized = string.Concat (CellSize.x, delimeterSpace, CellSize.y, delimeterSpace, Frames,
             delimeterSpace, (int) ImportMode, delimeterSpace, (int)GridSlicing, delimeterSpace,
-            (int) Pivot, delimeterSpace, CustomPivot.x, delimeterSpace, CustomPivot.y);
+            OverridePivot, delimeterSpace, (int) Pivot, delimeterSpace, CustomPivot.x,
+            delimeterSpace, CustomPivot.y);
         return serialized;
     }
     
@@ -46,12 +48,13 @@ public struct SpriteSlicingOptions
         if (entries.Length >= 3)
         {
             int.TryParse (entries[2], out options.Frames);
-            if (entries.Length >= 8)
+            if (entries.Length >= 9)
             {
                 options.ImportMode = (SpriteImportMode) int.Parse (entries[3]);
                 options.GridSlicing = (GridSlicingMethod) int.Parse (entries[4]);
-                options.Pivot = (SpriteAlignment) int.Parse (entries[5]);
-                options.CustomPivot = new Vector2 (float.Parse (entries[6]), float.Parse (entries[7]));
+                options.OverridePivot = bool.Parse (entries[5]);
+                options.Pivot = (SpriteAlignment) int.Parse (entries[6]);
+                options.CustomPivot = new Vector2 (float.Parse (entries[7]), float.Parse (entries[8]));
             }
         }
        

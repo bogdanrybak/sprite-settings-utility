@@ -14,7 +14,6 @@ namespace Staple.EditorScripts
     {
         public static void ApplyDefaultTextureSettings(Texture2D texture,
             SpriteSettings prefs, SpriteSlicingOptions slicingOptions,
-            bool changePivot,
             bool changePackingTag)
         {
             if (prefs == null) return;
@@ -35,7 +34,7 @@ namespace Staple.EditorScripts
                         slicingOptions.CellSize, slicingOptions.Pivot, slicingOptions.CustomPivot);
                 } else {
                     spriteSheet = SpriteSlicer.CreateSpriteSheetForTextureBogdan (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
-                        slicingOptions.CellSize, changePivot, prefs.Pivot, prefs.CustomPivot, (uint)slicingOptions.Frames);
+                        slicingOptions.CellSize, slicingOptions.OverridePivot, prefs.Pivot, prefs.CustomPivot, (uint)slicingOptions.Frames);
                 }
 
                 // If we don't do this it won't update the new sprite meta data
@@ -69,16 +68,18 @@ namespace Staple.EditorScripts
 
             settings.spriteExtrude = (uint)Mathf.Clamp(prefs.ExtrudeEdges, 0, 32);
             settings.spriteMeshType = prefs.SpriteMeshType;
-
-            if (changePivot)
+            
+            // Settings also store Sprite Alignment for Single spritemode
+            settings.spriteAlignment = (int)slicingOptions.Pivot;
+            if (slicingOptions.Pivot == SpriteAlignment.Custom)
             {
-                settings.spriteAlignment = (int)prefs.Pivot;
-                if (prefs.Pivot == SpriteAlignment.Custom)
-                    settings.spritePivot = prefs.CustomPivot;
+                settings.spritePivot = slicingOptions.CustomPivot;
             }
 
             if (changePackingTag)
+            {
                 importer.spritePackingTag = prefs.PackingTag;
+            }
 
             importer.SetTextureSettings(settings);
 #if UNITY_5_0

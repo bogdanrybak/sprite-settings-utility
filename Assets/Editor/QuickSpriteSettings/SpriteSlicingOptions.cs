@@ -15,18 +15,24 @@ public struct SpriteSlicingOptions
 
     public enum GridSlicingMethod
     {
-        Bogdan = 0,
-        SliceAll = 1,
+        SliceAll = 0,
+        Bogdan = 1,
     };
     
     public string ToDisplayString ()
     {
-        if (CellSize == Vector2.zero) 
-        {
-            return "Default Settings";
-        }
         
-        var displayString = string.Concat ("Cell Size: ", CellSize.x, ",", CellSize.y, " Frames: ", Frames );
+        var displayString = "";
+        if (ImportMode == SpriteImportMode.None) 
+        {
+            displayString = "Default Settings";
+        } else if (ImportMode == SpriteImportMode.Multiple)
+        {
+            displayString = string.Concat ("Cell Size: ", CellSize.x, ",", CellSize.y, " Frames: ", Frames );
+        } else if (ImportMode == SpriteImportMode.Single )
+        {
+            displayString = "Single Sprite";
+        }
         return displayString;
     }
     
@@ -47,6 +53,8 @@ public struct SpriteSlicingOptions
         
         // Default ImportMode to Multiple for versioned options
         options.ImportMode = UnityEditor.SpriteImportMode.Multiple;
+        // Default GridSlicing to Bogdan method
+        options.GridSlicing = GridSlicingMethod.Bogdan;
         
         options.CellSize = new Vector2 (int.Parse (entries[0]), int.Parse (entries[1]));
         if (entries.Length >= 3)

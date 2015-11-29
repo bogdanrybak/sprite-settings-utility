@@ -27,12 +27,12 @@ namespace Staple.EditorScripts
         SpriteSettingsConfigWindow configWindow;
         
         public SpriteFileSettings FileSettings;
-        bool slicingOptionsLoaded = false;
+        bool fileSettingsLoaded = false;
 
         void OnEnable()
         {
             config = AssetDatabase.LoadAssetAtPath(GetPathToConfig (), typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
-            LoadSlicingOptions ();
+            LoadFileSettings ();
             Selection.selectionChanged += HandleSelectionChanged;
         }
         
@@ -43,10 +43,10 @@ namespace Staple.EditorScripts
         
         void HandleSelectionChanged ()
         {
-            LoadSlicingOptions ();
+            LoadFileSettings ();
         }
         
-        void LoadSlicingOptions ()
+        void LoadFileSettings ()
         {
             if (currentSelectedSettings == null) 
             {
@@ -69,11 +69,11 @@ namespace Staple.EditorScripts
                 return;
             }
             
-            FileSettings = LoadFileSettingsForObject (Selection.activeObject);
-            slicingOptionsLoaded = true;
+            FileSettings = LoadSavedFileSettingsForObject (Selection.activeObject);
+            fileSettingsLoaded = true;
         }
         
-        SpriteFileSettings LoadFileSettingsForObject (Object obj)
+        SpriteFileSettings LoadSavedFileSettingsForObject (Object obj)
         {
             string path = AssetDatabase.GetAssetPath(obj);
             return SpriteSettingsUtility.GetFileSettings(path, currentSelectedSettings.SpritesheetDataFile);
@@ -133,8 +133,8 @@ namespace Staple.EditorScripts
             EditorGUILayout.Space ();
             bodyScrollPos = EditorGUILayout.BeginScrollView(bodyScrollPos);
 
-            if (!slicingOptionsLoaded) {
-                LoadSlicingOptions ();
+            if (!fileSettingsLoaded) {
+                LoadFileSettings ();
             }
             DrawFileSpecificSettings ();
 
@@ -178,7 +178,7 @@ namespace Staple.EditorScripts
                     {
                         // Load currently set fileSettings for multi-select. Otherwise use saved fileSettings
                         SpriteFileSettings settings = Selection.objects.Length == 1 ? 
-                            FileSettings : LoadFileSettingsForObject (obj);
+                            FileSettings : LoadSavedFileSettingsForObject (obj);
                         if (!settings.SlicingOptions.IsValid ()) {
                             Debug.LogWarning ("Skipping ApplyingTextureSettings to object due to invalid "
                                  + "Slicing Options. Object: " + obj.name);
@@ -276,7 +276,7 @@ namespace Staple.EditorScripts
                 {
                     if (IsObjectValidTexture (obj))
                     {
-                        FileSettings = LoadFileSettingsForObject (obj);
+                        FileSettings = LoadSavedFileSettingsForObject (obj);
                         slicingInfo += "\n" + obj.name + ": " + FileSettings.SlicingOptions.ToDisplayString ();
                     }
                 }

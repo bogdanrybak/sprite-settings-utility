@@ -89,16 +89,16 @@ namespace Staple.EditorScripts
         }
 
 
-        public static SpriteFileSettings  GetSlicingOptions(string path, string dataFileName)
+        public static SpriteFileSettings  GetFileSettings(string path, string dataFileName)
         {
-            var spriteSheetDataFile = AssetDatabase.LoadAssetAtPath(
+            var fileSettings = AssetDatabase.LoadAssetAtPath(
                 Path.GetDirectoryName(path) + "/" + dataFileName, typeof(TextAsset)
                 ) as TextAsset;
 
-            return GetSlicingOptions(path, spriteSheetDataFile);
+            return GetFileSettings(path, fileSettings);
         }
 
-        public static SpriteFileSettings GetSlicingOptions(string path, TextAsset slicingOptionsDataFile)
+        public static SpriteFileSettings GetFileSettings(string path, TextAsset slicingOptionsDataFile)
         {
             if (slicingOptionsDataFile != null)
             {

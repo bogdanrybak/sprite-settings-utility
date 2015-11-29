@@ -69,14 +69,14 @@ namespace Staple.EditorScripts
                 return;
             }
             
-            FileSettings = LoadSlicingOptionForObject (Selection.activeObject);
+            FileSettings = LoadFileSettingsForObject (Selection.activeObject);
             slicingOptionsLoaded = true;
         }
         
-        SpriteFileSettings LoadSlicingOptionForObject (Object obj)
+        SpriteFileSettings LoadFileSettingsForObject (Object obj)
         {
             string path = AssetDatabase.GetAssetPath(obj);
-            return SpriteSettingsUtility.GetSlicingOptions(path, currentSelectedSettings.SpritesheetDataFile);
+            return SpriteSettingsUtility.GetFileSettings(path, currentSelectedSettings.SpritesheetDataFile);
         }
         
         static bool IsObjectValidTexture (Object obj)
@@ -178,7 +178,7 @@ namespace Staple.EditorScripts
                     {
                         // Load currently set fileSettings for multi-select. Otherwise use saved fileSettings
                         SpriteFileSettings settings = Selection.objects.Length == 1 ? 
-                            FileSettings : LoadSlicingOptionForObject (obj);
+                            FileSettings : LoadFileSettingsForObject (obj);
                         if (!settings.SlicingOptions.IsValid ()) {
                             Debug.LogWarning ("Skipping ApplyingTextureSettings to object due to invalid "
                                  + "Slicing Options. Object: " + obj.name);
@@ -276,7 +276,7 @@ namespace Staple.EditorScripts
                 {
                     if (IsObjectValidTexture (obj))
                     {
-                        FileSettings = LoadSlicingOptionForObject (obj);
+                        FileSettings = LoadFileSettingsForObject (obj);
                         slicingInfo += "\n" + obj.name + ": " + FileSettings.SlicingOptions.ToDisplayString ();
                     }
                 }

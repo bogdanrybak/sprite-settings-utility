@@ -288,6 +288,12 @@ namespace Staple.EditorScripts
             DrawSlicingOptions ();
             
             EditorGUILayout.Space();
+            
+            EditorGUILayout.LabelField ("Override Settings", EditorStyles.boldLabel);
+            if (FileSettings.SlicingOptions.ImportMode != SpriteImportMode.None)
+            {
+                DrawPivotOverride ();
+            }
             DrawPackingTagOverride ();
         }
         
@@ -340,23 +346,23 @@ namespace Staple.EditorScripts
                 
                 EditorGUILayout.Space();
             }
-            
-            if (FileSettings.SlicingOptions.ImportMode != SpriteImportMode.None)
-            {
-                FileSettings.SlicingOptions.OverridePivot = EditorGUILayout.BeginToggleGroup("Override Pivot", 
-                    FileSettings.SlicingOptions.OverridePivot);
-                var pivotToUse = FileSettings.SlicingOptions.OverridePivot ? 
-                    FileSettings.SlicingOptions.Pivot : currentSelectedSettings.Pivot;
-                FileSettings.SlicingOptions.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(pivotToUse);
-    
-                bool showCustomPivot = FileSettings.SlicingOptions.Pivot == SpriteAlignment.Custom;
-                EditorGUI.BeginDisabledGroup (!showCustomPivot);
-                var customPivotToUse = FileSettings.SlicingOptions.OverridePivot ? 
-                    FileSettings.SlicingOptions.CustomPivot : currentSelectedSettings.CustomPivot;
-                FileSettings.SlicingOptions.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", customPivotToUse);
-                EditorGUI.EndDisabledGroup ();
-                EditorGUILayout.EndToggleGroup();
-            }
+        }
+        
+        void DrawPivotOverride ()
+        {
+            FileSettings.SlicingOptions.OverridePivot = EditorGUILayout.BeginToggleGroup("Override Pivot", 
+                FileSettings.SlicingOptions.OverridePivot);
+            var pivotToUse = FileSettings.SlicingOptions.OverridePivot ? 
+                FileSettings.SlicingOptions.Pivot : currentSelectedSettings.Pivot;
+            FileSettings.SlicingOptions.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(pivotToUse);
+
+            bool showCustomPivot = FileSettings.SlicingOptions.Pivot == SpriteAlignment.Custom;
+            EditorGUI.BeginDisabledGroup (!showCustomPivot);
+            var customPivotToUse = FileSettings.SlicingOptions.OverridePivot ? 
+                FileSettings.SlicingOptions.CustomPivot : currentSelectedSettings.CustomPivot;
+            FileSettings.SlicingOptions.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", customPivotToUse);
+            EditorGUI.EndDisabledGroup ();
+            EditorGUILayout.EndToggleGroup();
         }
     }
 }

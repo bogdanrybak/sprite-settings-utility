@@ -25,7 +25,8 @@ namespace Staple.EditorScripts
         private SpriteSettingsConfig config;
         private Vector2 bodyScrollPos;
         SpriteSettingsConfigWindow configWindow;
-        SpriteSlicingOptions slicingOptions;
+        
+        public SpriteFileSettings FileSettings;
         bool slicingOptionsLoaded = false;
 
         void OnEnable()
@@ -68,11 +69,11 @@ namespace Staple.EditorScripts
                 return;
             }
             
-            slicingOptions = LoadSlicingOptionForObject (Selection.activeObject);
+            FileSettings = LoadSlicingOptionForObject (Selection.activeObject);
             slicingOptionsLoaded = true;
         }
         
-        SpriteSlicingOptions LoadSlicingOptionForObject (Object obj)
+        SpriteFileSettings LoadSlicingOptionForObject (Object obj)
         {
             string path = AssetDatabase.GetAssetPath(obj);
             return SpriteSettingsUtility.GetSlicingOptions(path, currentSelectedSettings.SpritesheetDataFile);
@@ -129,18 +130,16 @@ namespace Staple.EditorScripts
             DrawSaveSettingSelect ();
             
             EditorGUILayout.Space ();
-
+            EditorGUILayout.Space ();
             bodyScrollPos = EditorGUILayout.BeginScrollView(bodyScrollPos);
 
-            DrawQuickSettings();
-
-            EditorGUILayout.Space();
-            
             if (!slicingOptionsLoaded) {
                 LoadSlicingOptions ();
             }
-            DrawSlicingOptions ();
+            DrawFileSpecificSettings ();
 
+            EditorGUILayout.Space();
+            
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
         }
@@ -177,10 +176,10 @@ namespace Staple.EditorScripts
                 {
                     if (IsObjectValidTexture (obj))
                     {
-                        // Load currently set options for multi-select. Otherwise use saved options
-                        SpriteSlicingOptions options = Selection.objects.Length == 1 ? slicingOptions :
-                            LoadSlicingOptionForObject (obj);
-                        if (!options.IsValid ()) {
+                        // Load currently set fileSettings for multi-select. Otherwise use saved fileSettings
+                        SpriteFileSettings settings = Selection.objects.Length == 1 ? 
+                            FileSettings : LoadSlicingOptionForObject (obj);
+                        if (!settings.SlicingOptions.IsValid ()) {
                             Debug.LogWarning ("Skipping ApplyingTextureSettings to object due to invalid "
                                  + "Slicing Options. Object: " + obj.name);
                             continue;
@@ -188,7 +187,7 @@ namespace Staple.EditorScripts
                         string path = AssetDatabase.GetAssetPath (obj);
                         var selectedTexture = AssetDatabase.LoadAssetAtPath <Texture2D> (path);
                         SpriteSettingsUtility.ApplyDefaultTextureSettings(selectedTexture,
-                            currentSelectedSettings, options, changePackingTag);
+                            currentSelectedSettings, settings);
                     }
                 }
                 
@@ -268,13 +267,40 @@ namespace Staple.EditorScripts
             EditorGUILayout.EndHorizontal ();
         }
 
-        void DrawQuickSettings()
+        void DrawFileSpecificSettings ()
         {
-            changePackingTag = EditorGUILayout.BeginToggleGroup("Apply Packing Tag", changePackingTag);
+            if (Selection.objects.Length > 1)
+            {
+                string slicingInfo = "";
+                foreach (var obj in Selection.objects)
+                {
+                    if (IsObjectValidTexture (obj))
+                    {
+                        FileSettings = LoadSlicingOptionForObject (obj);
+                        slicingInfo += "\n" + obj.name + ": " + FileSettings.SlicingOptions.ToDisplayString ();
+                    }
+                }
+                EditorGUILayout.HelpBox ("File Settings do not support Multiple-Object editing. "
+                    + " The following settings will be used:\n" + slicingInfo, MessageType.Info);
+                return;
+            }
+            
+            DrawSlicingOptions ();
+            
+            EditorGUILayout.Space();
+            DrawPackingTagOverride ();
+        }
+        
+        void DrawPackingTagOverride ()
+        {
+            FileSettings.OverridePackingTag = EditorGUILayout.BeginToggleGroup("Override Packing Tag", 
+                FileSettings.OverridePackingTag);
 
-            currentSelectedSettings.PackingTag = EditorGUILayout.TextField(currentSelectedSettings.PackingTag);
+            var tagToUse = FileSettings.OverridePackingTag ? 
+                FileSettings.PackingTag : currentSelectedSettings.PackingTag;
+            FileSettings.PackingTag = EditorGUILayout.TextField(tagToUse);
 
-            if (changePackingTag)
+            if (FileSettings.OverridePackingTag)
             {
                 foreach (var name in UnityEditor.Sprites.Packer.atlasNames)
                 {
@@ -291,55 +317,43 @@ namespace Staple.EditorScripts
         
         void DrawSlicingOptions ()
         {
-            EditorGUILayout.Space();
-            
             EditorGUILayout.LabelField ("Slicing Options", EditorStyles.boldLabel);
-            if (Selection.objects.Length > 1)
-            {
-                string slicingInfo = "";
-                foreach (var obj in Selection.objects)
-                {
-                    if (IsObjectValidTexture (obj))
-                    {
-                        slicingOptions = LoadSlicingOptionForObject (obj);
-                        slicingInfo += "\n" + obj.name + ": " + slicingOptions.ToDisplayString ();
-                    }
-                }
-                EditorGUILayout.HelpBox ("Slicing Options does not support Multiple-Object editing. "
-                    + " The following settings will be used:\n" + slicingInfo, MessageType.Info);
-                return;
-            }
             
-            slicingOptions.ImportMode = (SpriteImportMode) EditorGUILayout.EnumPopup 
-                ("Sprite Import Mode", slicingOptions.ImportMode);
+            FileSettings.SlicingOptions.ImportMode = (SpriteImportMode) EditorGUILayout.EnumPopup 
+                ("Sprite Import Mode", FileSettings.SlicingOptions.ImportMode);
                 
             EditorGUILayout.Space();
             
-            if (slicingOptions.ImportMode == SpriteImportMode.Multiple)
+            if (FileSettings.SlicingOptions.ImportMode == SpriteImportMode.Multiple)
             {
-                slicingOptions.GridSlicing = (SpriteSlicingOptions.GridSlicingMethod) 
-                EditorGUILayout.EnumPopup ("Grid Slicing Method", slicingOptions.GridSlicing);
+                FileSettings.SlicingOptions.GridSlicing = (SpriteSlicingOptions.GridSlicingMethod) 
+                EditorGUILayout.EnumPopup ("Grid Slicing Method", FileSettings.SlicingOptions.GridSlicing);
             
-                if (slicingOptions.GridSlicing == SpriteSlicingOptions.GridSlicingMethod.Bogdan)
+                if (FileSettings.SlicingOptions.GridSlicing == SpriteSlicingOptions.GridSlicingMethod.Bogdan)
                 {
-                    slicingOptions.Frames = EditorGUILayout.IntField ("Frames", slicingOptions.Frames);
+                    FileSettings.SlicingOptions.Frames = EditorGUILayout.IntField ("Frames",
+                        FileSettings.SlicingOptions.Frames);
                 }
                 
-                slicingOptions.CellSize = EditorGUILayout.Vector2Field ("Cell Size (X/Y)", slicingOptions.CellSize);
+                FileSettings.SlicingOptions.CellSize = EditorGUILayout.Vector2Field ("Cell Size (X/Y)",
+                    FileSettings.SlicingOptions.CellSize);
                 
                 EditorGUILayout.Space();
             }
             
-            if (slicingOptions.ImportMode != SpriteImportMode.None)
+            if (FileSettings.SlicingOptions.ImportMode != SpriteImportMode.None)
             {
-                slicingOptions.OverridePivot = EditorGUILayout.BeginToggleGroup("Override Pivot", slicingOptions.OverridePivot);
-                var pivotToUse = slicingOptions.OverridePivot ? slicingOptions.Pivot : currentSelectedSettings.Pivot;
-                slicingOptions.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(pivotToUse);
+                FileSettings.SlicingOptions.OverridePivot = EditorGUILayout.BeginToggleGroup("Override Pivot", 
+                    FileSettings.SlicingOptions.OverridePivot);
+                var pivotToUse = FileSettings.SlicingOptions.OverridePivot ? 
+                    FileSettings.SlicingOptions.Pivot : currentSelectedSettings.Pivot;
+                FileSettings.SlicingOptions.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(pivotToUse);
     
-                bool showCustomPivot = slicingOptions.Pivot == SpriteAlignment.Custom;
+                bool showCustomPivot = FileSettings.SlicingOptions.Pivot == SpriteAlignment.Custom;
                 EditorGUI.BeginDisabledGroup (!showCustomPivot);
-                var customPivotToUse = slicingOptions.OverridePivot ? slicingOptions.CustomPivot : currentSelectedSettings.CustomPivot;
-                slicingOptions.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", customPivotToUse);
+                var customPivotToUse = FileSettings.SlicingOptions.OverridePivot ? 
+                    FileSettings.SlicingOptions.CustomPivot : currentSelectedSettings.CustomPivot;
+                FileSettings.SlicingOptions.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", customPivotToUse);
                 EditorGUI.EndDisabledGroup ();
                 EditorGUILayout.EndToggleGroup();
             }

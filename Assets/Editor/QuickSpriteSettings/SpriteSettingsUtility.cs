@@ -13,8 +13,7 @@ namespace Staple.EditorScripts
     public class SpriteSettingsUtility
     {
         public static void ApplyDefaultTextureSettings(Texture2D texture,
-            SpriteSettings prefs, SpriteSlicingOptions slicingOptions,
-            bool changePackingTag)
+            SpriteSettings prefs, SpriteFileSettings fileSettings)
         {
             if (prefs == null) return;
 
@@ -22,6 +21,7 @@ namespace Staple.EditorScripts
             var importer = AssetImporter.GetAtPath(path) as TextureImporter;
             
             // When we have text file data
+            SpriteSlicingOptions slicingOptions = fileSettings.SlicingOptions;
             if (slicingOptions.ImportMode == SpriteImportMode.Multiple)
             {
                 // Clamp cellSize to texture width and height
@@ -76,10 +76,7 @@ namespace Staple.EditorScripts
                 settings.spritePivot = slicingOptions.CustomPivot;
             }
 
-            if (changePackingTag)
-            {
-                importer.spritePackingTag = prefs.PackingTag;
-            }
+            importer.spritePackingTag = fileSettings.PackingTag;
 
             importer.SetTextureSettings(settings);
 #if UNITY_5_0
@@ -88,11 +85,11 @@ namespace Staple.EditorScripts
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
 #endif
             EditorUtility.SetDirty(texture);
-            WriteSlicingOptions (path, prefs.SpritesheetDataFile, texture.name + ".png", slicingOptions);
+            WriteSpriteFileSettings (path, prefs.SpritesheetDataFile, texture.name + ".png", fileSettings);
         }
 
 
-        public static SpriteSlicingOptions  GetSlicingOptions(string path, string dataFileName)
+        public static SpriteFileSettings  GetSlicingOptions(string path, string dataFileName)
         {
             var spriteSheetDataFile = AssetDatabase.LoadAssetAtPath(
                 Path.GetDirectoryName(path) + "/" + dataFileName, typeof(TextAsset)
@@ -101,7 +98,7 @@ namespace Staple.EditorScripts
             return GetSlicingOptions(path, spriteSheetDataFile);
         }
 
-        public static SpriteSlicingOptions GetSlicingOptions(string path, TextAsset slicingOptionsDataFile)
+        public static SpriteFileSettings GetSlicingOptions(string path, TextAsset slicingOptionsDataFile)
         {
             if (slicingOptionsDataFile != null)
             {
@@ -117,7 +114,7 @@ namespace Staple.EditorScripts
                         int firstIndex = entry.IndexOf (',') + 1;
                         int lastIndex = entry.Length - 1;
                         var slicingData = entry.Substring (firstIndex, lastIndex - firstIndex + 1);
-                        return SpriteSlicingOptions.FromString (slicingData);
+                        return SpriteFileSettings.FromString (slicingData);
                     } catch (SystemException e)
                     {
                         Debug.LogError (string.Format ("Encountered error in saved slicing options file. Entry: " + entry
@@ -126,14 +123,14 @@ namespace Staple.EditorScripts
                 }
             }
 
-            return new SpriteSlicingOptions ();
+            return new SpriteFileSettings ();
         }
-        public static void WriteSlicingOptions(string path, string dataFileName, string key, SpriteSlicingOptions slicingOptions)
+        static void WriteSpriteFileSettings(string path, string dataFileName, string key, SpriteFileSettings spriteFileSettings)
         {
             string textAssetPath = Path.GetDirectoryName(path) + "/" + dataFileName;
             var spriteSheetDataFile = AssetDatabase.LoadAssetAtPath(textAssetPath, typeof(TextAsset)) as TextAsset;
             
-            string newEntry = string.Concat (key, ", ", slicingOptions.ToString ());
+            string newEntry = string.Concat (key, ", ", spriteFileSettings.ToString ());
             
             // Create new file if none exists
             if (spriteSheetDataFile == null) 

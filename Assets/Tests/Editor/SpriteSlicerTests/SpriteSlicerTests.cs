@@ -23,8 +23,11 @@ public class SpriteSlicerTests {
         var expectedImporter = AssetImporter.GetAtPath(pathToExpectedOffset) as TextureImporter;
         var expectedSpritesheet = expectedImporter.spritesheet;
         
-        SpriteMetaData[] createdSpritesheet = SpriteSlicer.CreateSpriteSheetForTexture (SampleTexture, new Vector2 (86, 86), 
-            SpriteAlignment.Center);
+        var slicingOptions = new SpriteSlicingOptions ();
+        slicingOptions.CellSize = new Vector2 (86, 86);
+        slicingOptions.ImportMode = UnityEditor.SpriteImportMode.Multiple;
+        slicingOptions.Pivot = SpriteAlignment.Center;
+        SpriteMetaData[] createdSpritesheet = SpriteSlicer.CreateSpriteSheetForTexture (SampleTexture, slicingOptions);
         
         Assert.AreEqual (expectedSpritesheet.Length, createdSpritesheet.Length, 
             "Number of Slices not equal to NumExpectedSlices"); 
@@ -35,8 +38,11 @@ public class SpriteSlicerTests {
         var expectedImporter = AssetImporter.GetAtPath(pathToExpectedNormal) as TextureImporter;
         var expectedSpritesheet = expectedImporter.spritesheet;
         
-        SpriteMetaData[] createdSpritesheet = SpriteSlicer.CreateSpriteSheetForTexture (SampleTexture, new Vector2 (86, 86), 
-            SpriteAlignment.Center);
+        var slicingOptions = new SpriteSlicingOptions ();
+        slicingOptions.CellSize = new Vector2 (86, 86);
+        slicingOptions.ImportMode = UnityEditor.SpriteImportMode.Multiple;
+        slicingOptions.Pivot = SpriteAlignment.Center;
+        SpriteMetaData[] createdSpritesheet = SpriteSlicer.CreateSpriteSheetForTexture (SampleTexture, slicingOptions);
         
         CompareFirstAndLastRects (expectedSpritesheet, createdSpritesheet);
 	}
@@ -46,8 +52,11 @@ public class SpriteSlicerTests {
         var expectedImporter = AssetImporter.GetAtPath(pathToExpectedOffset) as TextureImporter;
         var expectedSpritesheet = expectedImporter.spritesheet;
         
-        SpriteMetaData[] createdSpritesheet = SpriteSlicer.CreateSpriteSheetForTexture (SampleTexture, new Vector2 (80, 80), 
-            SpriteAlignment.Center);
+        var slicingOptions = new SpriteSlicingOptions ();
+        slicingOptions.CellSize = new Vector2 (80, 80);
+        slicingOptions.ImportMode = UnityEditor.SpriteImportMode.Multiple;
+        slicingOptions.Pivot = SpriteAlignment.Center;
+        SpriteMetaData[] createdSpritesheet = SpriteSlicer.CreateSpriteSheetForTexture (SampleTexture, slicingOptions);
         
         CompareFirstAndLastRects (expectedSpritesheet, createdSpritesheet);
 	}

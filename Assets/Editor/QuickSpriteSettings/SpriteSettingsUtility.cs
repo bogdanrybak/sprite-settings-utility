@@ -30,11 +30,11 @@ namespace Staple.EditorScripts
                 
                 SpriteMetaData[] spriteSheet;
                 if (slicingOptions.GridSlicing == SpriteSlicingOptions.GridSlicingMethod.SliceAll) {
-                    spriteSheet = SpriteSlicer.CreateSpriteSheetForTexture (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
-                        slicingOptions.CellSize, slicingOptions.Pivot, slicingOptions.CustomPivot);
+                    spriteSheet = SpriteSlicer.CreateSpriteSheetForTexture (AssetDatabase.LoadAssetAtPath(path,
+                        typeof(Texture2D)) as Texture2D, slicingOptions);
                 } else {
-                    spriteSheet = SpriteSlicer.CreateSpriteSheetForTextureBogdan (AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
-                        slicingOptions.CellSize, slicingOptions.OverridePivot, prefs.Pivot, prefs.CustomPivot, (uint)slicingOptions.Frames);
+                    spriteSheet = SpriteSlicer.CreateSpriteSheetForTextureBogdan (AssetDatabase.LoadAssetAtPath(path, 
+                        typeof(Texture2D)) as Texture2D, slicingOptions);
                 }
 
                 // If we don't do this it won't update the new sprite meta data

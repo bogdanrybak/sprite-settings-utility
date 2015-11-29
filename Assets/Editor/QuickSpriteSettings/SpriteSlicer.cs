@@ -9,16 +9,15 @@ namespace Staple.EditorScripts
 {
     public static class SpriteSlicer
     {
-        public static SpriteMetaData[] CreateSpriteSheetForTexture (Texture2D texture, Vector2 cellSize, 
-            SpriteAlignment pivot, Vector2 customPivot = default (Vector2))
+        public static SpriteMetaData[] CreateSpriteSheetForTexture (Texture2D texture, SpriteSlicingOptions slicingOptions)
         {
             List<SpriteMetaData> sprites = new List<SpriteMetaData> ();
-            Rect[] gridRects = GetAllSliceRectsForTexture (texture, cellSize);
+            Rect[] gridRects = GetAllSliceRectsForTexture (texture, slicingOptions.CellSize);
             for (int i = 0; i < gridRects.Length; i++) {
                 SpriteMetaData spriteMetaData = new SpriteMetaData ();
                 spriteMetaData.rect = gridRects[i];
-                spriteMetaData.alignment = (int) pivot;
-                spriteMetaData.pivot = customPivot;
+                spriteMetaData.alignment = (int) slicingOptions.Pivot;
+                spriteMetaData.pivot = slicingOptions.CustomPivot;
                 spriteMetaData.name = texture.name + "_" + i;
                 sprites.Add (spriteMetaData);
             }
@@ -41,10 +40,10 @@ namespace Staple.EditorScripts
             return rects;
         }
     
-        public static SpriteMetaData[] CreateSpriteSheetForTextureBogdan (Texture2D texture, Vector2 cellSize, bool forcePivotChange, 
-            SpriteAlignment pivot, Vector2 customPivot = default (Vector2), uint frames = 0)
+        public static SpriteMetaData[] CreateSpriteSheetForTextureBogdan (Texture2D texture, SpriteSlicingOptions slicingOptions)
         {
-            Rect[] gridRects = InternalSpriteUtility.GenerateGridSpriteRectangles(texture, Vector2.zero, cellSize, Vector2.zero);
+            Rect[] gridRects = InternalSpriteUtility.GenerateGridSpriteRectangles(texture, Vector2.zero,
+                slicingOptions.CellSize, Vector2.zero);
             
             string path = AssetDatabase.GetAssetPath(texture);
             var importer = AssetImporter.GetAtPath(path) as TextureImporter;
@@ -58,18 +57,18 @@ namespace Staple.EditorScripts
             for (var i = 0; i < spriteSheet.Length; i++)
             {
                 bool sliceExists = importer.spritesheet != null && i < importer.spritesheet.Length;
-                bool changePivot = !sliceExists || forcePivotChange;
+                bool changePivot = !sliceExists || slicingOptions.OverridePivot;
                 spriteSheet[i] = new SpriteMetaData
                 {
-                    alignment = changePivot ? (int) pivot: spriteSheet[i].alignment,
-                    pivot = changePivot ? customPivot : spriteSheet[i].pivot,
+                    alignment = changePivot ? (int) slicingOptions.Pivot: spriteSheet[i].alignment,
+                    pivot = changePivot ? slicingOptions.CustomPivot : spriteSheet[i].pivot,
                     name = sliceExists ? spriteSheet[i].name : texture.name + "_" + i,
                     rect = gridRects[i]
                 };
             }
             
-            if (frames > 0)
-                spriteSheet = spriteSheet.Take((int) frames).ToArray();
+            if (slicingOptions.Frames > 0)
+                spriteSheet = spriteSheet.Take((int) slicingOptions.Frames).ToArray();
     
             return spriteSheet;
         }

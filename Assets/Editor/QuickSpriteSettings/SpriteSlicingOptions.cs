@@ -44,6 +44,10 @@ public struct SpriteSlicingOptions
     {
         var options = new SpriteSlicingOptions ();
         string[] entries = serialized.Split (delimeterChar);
+        
+        // Default ImportMode to Multiple for versioned options
+        options.ImportMode = UnityEditor.SpriteImportMode.Multiple;
+        
         options.CellSize = new Vector2 (int.Parse (entries[0]), int.Parse (entries[1]));
         if (entries.Length >= 3)
         {

@@ -36,11 +36,11 @@ namespace Staple.EditorScripts
         private bool changePackingTag;
         private SpriteSettingsConfig config;
         private Vector2 bodyScrollPos;
+        SpriteSettingsConfigWindow configWindow;
 
         void OnEnable()
         {
-            config = AssetDatabase.LoadAssetAtPath(SpriteSettingsConfig.DefaultPath,
-                typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
+            config = AssetDatabase.LoadAssetAtPath(GetPathToConfig (), typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
         }
 
         void OnInspectorUpdate()
@@ -93,6 +93,10 @@ namespace Staple.EditorScripts
 				}
                 
                 Close();
+                if (configWindow != null) 
+                {
+                    configWindow.Close ();
+                }
             }
             GUI.backgroundColor = defaultBg;
         }
@@ -105,7 +109,9 @@ namespace Staple.EditorScripts
                 if (config == null) {
                     CreateConfig ();
                 }
-                EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
+                
+                ShowConfigWindow (0);
+                
                 if (config.SettingsSets.Count == 0) {
                     config.AddDefaultSpriteSetting ();
                 }
@@ -115,7 +121,23 @@ namespace Staple.EditorScripts
         
         void CreateConfig ()
         {
-            config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(SpriteSettingsConfig.DefaultPath);
+            config = ScriptableObjectUtility.CreateAssetAtPath<SpriteSettingsConfig>(GetPathToConfig ());
+        }
+        
+        string GetPathToConfig ()
+        {
+            MonoScript script = MonoScript.FromScriptableObject (this);
+            string scriptPath = AssetDatabase.GetAssetPath (script);
+            string scriptDirectory = System.IO.Path.GetDirectoryName (scriptPath);
+            string filename = SpriteSettingsConfig.DefaultFilename;
+            return scriptDirectory + System.IO.Path.DirectorySeparatorChar + filename;
+        }
+        
+        void ShowConfigWindow (int indexToFocus)
+        {
+                configWindow = EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
+                configWindow.SetConfig (config);
+                configWindow.SelectSetting (indexToFocus);
         }
         
         void DrawSaveSettingSelect ()
@@ -135,9 +157,7 @@ namespace Staple.EditorScripts
                                                         savedSetNames, savedSetIndeces);
             currentSelectedSettings = config.SettingsSets [selectedSettingIndex];
             if (GUILayout.Button ("Edit", GUILayout.MaxWidth(80.0f))) {
-                SpriteSettingsConfigWindow window = 
-                    EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
-                window.SelectSetting (selectedSettingIndex);
+                ShowConfigWindow (selectedSettingIndex);
             }
             EditorGUILayout.EndHorizontal ();
         }

@@ -186,7 +186,7 @@ namespace Staple.EditorScripts
                         }
                         string path = AssetDatabase.GetAssetPath (obj);
                         var selectedTexture = AssetDatabase.LoadAssetAtPath <Texture2D> (path);
-                        SpriteSettingsUtility.ApplyDefaultTextureSettings(selectedTexture,
+                        SpriteSettingsUtility.ApplySpriteSettings(selectedTexture,
                             currentSelectedSettings, settings);
                     }
                 }

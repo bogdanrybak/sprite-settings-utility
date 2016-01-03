@@ -12,7 +12,7 @@ namespace Staple.EditorScripts
 {
     public class SpriteSettingsUtility
     {
-        public static void ApplyDefaultTextureSettings(Texture2D texture,
+        public static void ApplySpriteSettings(Texture2D texture,
             SpriteSettings prefs, SpriteFileSettings fileSettings)
         {
             if (prefs == null) return;
@@ -52,6 +52,7 @@ namespace Staple.EditorScripts
 
             TextureImporterSettings settings = new TextureImporterSettings();
             importer.ReadTextureSettings(settings);
+            importer.textureType = TextureImporterType.Advanced;
 
             settings.filterMode = prefs.FilterMode;
             settings.wrapMode = prefs.WrapMode;

@@ -196,12 +196,6 @@ namespace Staple.EditorScripts
                     UnityEditor.Sprites.Packer.RebuildAtlasCacheIfNeeded(
                     EditorUserBuildSettings.activeBuildTarget, true);
                 }
-                
-                Close();
-                if (configWindow != null) 
-                {
-                    configWindow.Close ();
-                }
             }
             GUI.backgroundColor = defaultBg;
         }

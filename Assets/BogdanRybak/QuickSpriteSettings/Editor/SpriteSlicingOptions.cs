@@ -6,7 +6,7 @@ namespace Staple.EditorScripts
     [System.Serializable]
     public struct SpriteSlicingOptions
     {
-        public GridSlicingMethod GridSlicing;
+        public GridSlicingMethod SlicingMethod;
         public Vector2 CellSize;
         public SpriteAlignment Pivot;
         public bool OverridePivot;
@@ -42,7 +42,7 @@ namespace Staple.EditorScripts
         {
             string delimeterSpace = delimeterChar + " ";
             string serialized = string.Concat (CellSize.x, delimeterSpace, CellSize.y, delimeterSpace, Frames,
-                delimeterSpace, (int) ImportMode, delimeterSpace, (int)GridSlicing, delimeterSpace,
+                delimeterSpace, (int) ImportMode, delimeterSpace, (int)SlicingMethod, delimeterSpace,
                 OverridePivot, delimeterSpace, (int) Pivot, delimeterSpace, CustomPivot.x,
                 delimeterSpace, CustomPivot.y);
             return serialized;
@@ -56,7 +56,7 @@ namespace Staple.EditorScripts
             // Default ImportMode to Multiple for versioned options
             options.ImportMode = UnityEditor.SpriteImportMode.Multiple;
             // Default GridSlicing to Bogdan method
-            options.GridSlicing = GridSlicingMethod.Bogdan;
+            options.SlicingMethod = GridSlicingMethod.Bogdan;
             
             options.CellSize = new Vector2 (int.Parse (entries[0]), int.Parse (entries[1]));
             if (entries.Length >= 3)
@@ -65,7 +65,7 @@ namespace Staple.EditorScripts
                 if (entries.Length >= 9)
                 {
                     options.ImportMode = (SpriteImportMode) int.Parse (entries[3]);
-                    options.GridSlicing = (GridSlicingMethod) int.Parse (entries[4]);
+                    options.SlicingMethod = (GridSlicingMethod) int.Parse (entries[4]);
                     options.OverridePivot = bool.Parse (entries[5]);
                     options.Pivot = (SpriteAlignment) int.Parse (entries[6]);
                     options.CustomPivot = new Vector2 (float.Parse (entries[7]), float.Parse (entries[8]));

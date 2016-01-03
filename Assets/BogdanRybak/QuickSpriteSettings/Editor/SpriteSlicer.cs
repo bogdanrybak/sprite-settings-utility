@@ -9,7 +9,22 @@ namespace Staple.EditorScripts
 {
     public static class SpriteSlicer
     {
+        
         public static SpriteMetaData[] CreateSpriteSheetForTexture (Texture2D texture, SpriteSlicingOptions slicingOptions)
+        {
+            switch (slicingOptions.SlicingMethod)
+            {
+                case SpriteSlicingOptions.GridSlicingMethod.SliceAll :
+                    return CreateSpriteSheetForTextureSliceAll (texture, slicingOptions);
+                case SpriteSlicingOptions.GridSlicingMethod.Bogdan :
+                    return CreateSpriteSheetForTextureBogdan (texture, slicingOptions);
+                default :
+                    Debug.LogError ("Trying to create spritesheet with unknown slicing method: " + slicingOptions.SlicingMethod);
+                    return null;
+            }
+        }
+        
+        static SpriteMetaData[] CreateSpriteSheetForTextureSliceAll (Texture2D texture, SpriteSlicingOptions slicingOptions)
         {
             List<SpriteMetaData> sprites = new List<SpriteMetaData> ();
             Rect[] gridRects = GetAllSliceRectsForTexture (texture, slicingOptions.CellSize);
@@ -40,7 +55,7 @@ namespace Staple.EditorScripts
             return rects;
         }
     
-        public static SpriteMetaData[] CreateSpriteSheetForTextureBogdan (Texture2D texture, SpriteSlicingOptions slicingOptions)
+        static SpriteMetaData[] CreateSpriteSheetForTextureBogdan (Texture2D texture, SpriteSlicingOptions slicingOptions)
         {
             Rect[] gridRects = InternalSpriteUtility.GenerateGridSpriteRectangles(texture, Vector2.zero,
                 slicingOptions.CellSize, Vector2.zero);

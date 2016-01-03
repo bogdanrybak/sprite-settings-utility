@@ -29,13 +29,8 @@ namespace Staple.EditorScripts
                 slicingOptions.CellSize.y = Mathf.Min (texture.height, slicingOptions.CellSize.y);
                 
                 SpriteMetaData[] spriteSheet;
-                if (slicingOptions.GridSlicing == SpriteSlicingOptions.GridSlicingMethod.SliceAll) {
-                    spriteSheet = SpriteSlicer.CreateSpriteSheetForTexture (AssetDatabase.LoadAssetAtPath(path,
-                        typeof(Texture2D)) as Texture2D, slicingOptions);
-                } else {
-                    spriteSheet = SpriteSlicer.CreateSpriteSheetForTextureBogdan (AssetDatabase.LoadAssetAtPath(path, 
-                        typeof(Texture2D)) as Texture2D, slicingOptions);
-                }
+                spriteSheet = SpriteSlicer.CreateSpriteSheetForTexture (AssetDatabase.LoadAssetAtPath(path,
+                    typeof(Texture2D)) as Texture2D, slicingOptions);
 
                 // If we don't do this it won't update the new sprite meta data
                 importer.spriteImportMode = SpriteImportMode.Single;

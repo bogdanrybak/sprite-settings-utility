@@ -27,6 +27,7 @@ public class SpriteSlicerTests {
         slicingOptions.CellSize = new Vector2 (86, 86);
         slicingOptions.ImportMode = UnityEditor.SpriteImportMode.Multiple;
         slicingOptions.Pivot = SpriteAlignment.Center;
+        slicingOptions.SlicingMethod = SpriteSlicingOptions.GridSlicingMethod.SliceAll;
         SpriteMetaData[] createdSpritesheet = SpriteSlicer.CreateSpriteSheetForTexture (SampleTexture, slicingOptions);
         
         Assert.AreEqual (expectedSpritesheet.Length, createdSpritesheet.Length, 
@@ -42,6 +43,7 @@ public class SpriteSlicerTests {
         slicingOptions.CellSize = new Vector2 (86, 86);
         slicingOptions.ImportMode = UnityEditor.SpriteImportMode.Multiple;
         slicingOptions.Pivot = SpriteAlignment.Center;
+        slicingOptions.SlicingMethod = SpriteSlicingOptions.GridSlicingMethod.SliceAll;
         SpriteMetaData[] createdSpritesheet = SpriteSlicer.CreateSpriteSheetForTexture (SampleTexture, slicingOptions);
         
         CompareFirstAndLastRects (expectedSpritesheet, createdSpritesheet);
@@ -56,6 +58,7 @@ public class SpriteSlicerTests {
         slicingOptions.CellSize = new Vector2 (80, 80);
         slicingOptions.ImportMode = UnityEditor.SpriteImportMode.Multiple;
         slicingOptions.Pivot = SpriteAlignment.Center;
+        slicingOptions.SlicingMethod = SpriteSlicingOptions.GridSlicingMethod.SliceAll;
         SpriteMetaData[] createdSpritesheet = SpriteSlicer.CreateSpriteSheetForTexture (SampleTexture, slicingOptions);
         
         CompareFirstAndLastRects (expectedSpritesheet, createdSpritesheet);

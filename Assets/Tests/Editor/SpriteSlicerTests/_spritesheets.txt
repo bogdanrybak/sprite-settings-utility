@@ -1,0 +1,1 @@
+Expected80x81.png, False, , 80, 80, 0, 2, 1, False, 0, 0, 0

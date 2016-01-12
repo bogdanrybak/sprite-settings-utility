@@ -17,8 +17,8 @@ namespace Staple.EditorScripts
     
         public enum GridSlicingMethod
         {
-            SliceAll = 0,
-            Bogdan = 1,
+            Bogdan = 0,
+            SliceAll = 1,
         };
         
         public string ToDisplayString ()

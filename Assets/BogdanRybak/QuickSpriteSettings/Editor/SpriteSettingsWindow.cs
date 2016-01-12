@@ -326,9 +326,11 @@ namespace Staple.EditorScripts
             
             if (FileSettings.SlicingOptions.ImportMode == SpriteImportMode.Multiple)
             {
+                /*
+                // Future: Could add alternate slicing algorithms
                 FileSettings.SlicingOptions.SlicingMethod = (SpriteSlicingOptions.GridSlicingMethod) 
-                EditorGUILayout.EnumPopup ("Grid Slicing Method", FileSettings.SlicingOptions.SlicingMethod);
-            
+                    EditorGUILayout.EnumPopup ("Grid Slicing Method", FileSettings.SlicingOptions.SlicingMethod);
+                */
                 if (FileSettings.SlicingOptions.SlicingMethod == SpriteSlicingOptions.GridSlicingMethod.Bogdan)
                 {
                     FileSettings.SlicingOptions.Frames = EditorGUILayout.IntField ("Frames",

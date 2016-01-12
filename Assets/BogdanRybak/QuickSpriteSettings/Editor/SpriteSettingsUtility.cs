@@ -47,7 +47,7 @@ namespace Staple.EditorScripts
             } else
             {
                 throw new System.NotSupportedException ("Encountered unsupported SpriteImportMode:" 
-                    + importer.spriteImportMode);
+                    + slicingOptions.ImportMode);
             }
 
             TextureImporterSettings settings = new TextureImporterSettings();

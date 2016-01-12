@@ -63,15 +63,22 @@ namespace Staple.EditorScripts
             string path = AssetDatabase.GetAssetPath(texture);
             var importer = AssetImporter.GetAtPath(path) as TextureImporter;
     
-            var spriteSheet = importer.spritesheet ?? new SpriteMetaData[gridRects.Length];
-    
-            // Add new sprite meta data to the end for all the newly parsed grid rects?
+            var numNewSprites = gridRects.Length;
+            var numPreviousSprites = importer.spritesheet.Length;
+            var spriteSheet = new SpriteMetaData [numNewSprites];
+            // Fill new array with corresponding sprites from previous spritesheet first
+            int smallestSpritesheetSize = Mathf.Min (numPreviousSprites, numNewSprites);
             if (importer.spritesheet != null)
-                spriteSheet = spriteSheet.Concat(new SpriteMetaData[Mathf.Max(0, gridRects.Length - importer.spritesheet.Length)]).ToArray();
+            {
+                for (int i = 0; i < smallestSpritesheetSize; i++)
+                {
+                    spriteSheet[i] = importer.spritesheet[i];
+                }
+            }
             
             for (var i = 0; i < spriteSheet.Length; i++)
             {
-                bool sliceExists = importer.spritesheet != null && i < importer.spritesheet.Length;
+                bool sliceExists = importer.spritesheet != null && i < numPreviousSprites;
                 bool changePivot = !sliceExists || slicingOptions.OverridePivot;
                 spriteSheet[i] = new SpriteMetaData
                 {

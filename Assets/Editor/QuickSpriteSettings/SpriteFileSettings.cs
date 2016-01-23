@@ -1,4 +1,4 @@
-﻿namespace Staple.EditorScripts
+namespace Staple.EditorScripts
 {
     public struct SpriteFileSettings {
         public bool OverridePackingTag;

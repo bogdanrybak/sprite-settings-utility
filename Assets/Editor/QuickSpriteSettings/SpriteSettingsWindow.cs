@@ -15,32 +15,85 @@ namespace Staple.EditorScripts
         [MenuItem("Assets/Quick Sprite Settings", true)]
         public static bool TextureSelected()
         {
-            foreach (var obj in Selection.objects)
-            {
-                if (!AssetDatabase.Contains(obj)) continue;
-
-                var asset =
-                    AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(obj), typeof(Texture2D)) as Texture2D;
-
-                if (asset != null)
-                    return true;
-            }
-
-            return false;
+            return AtLeastOneTextureIsSelected ();
         }
 
         private SpriteSettings currentSelectedSettings;
         private int selectedSettingIndex;
         private bool showSettings;
-        private bool changePivot = true;
         private bool changePackingTag;
         private SpriteSettingsConfig config;
         private Vector2 bodyScrollPos;
         SpriteSettingsConfigWindow configWindow;
+        
+        public SpriteFileSettings FileSettings;
+        bool fileSettingsLoaded = false;
 
         void OnEnable()
         {
             config = AssetDatabase.LoadAssetAtPath(GetPathToConfig (), typeof(SpriteSettingsConfig)) as SpriteSettingsConfig;
+            LoadFileSettings ();
+            Selection.selectionChanged += HandleSelectionChanged;
+        }
+        
+        void OnDisable()
+        {
+            Selection.selectionChanged -= HandleSelectionChanged;
+        }
+        
+        void HandleSelectionChanged ()
+        {
+            LoadFileSettings ();
+        }
+        
+        void LoadFileSettings ()
+        {
+            if (currentSelectedSettings == null) 
+            {
+                return;
+            }
+            
+            if (Selection.objects.Length == 0)
+            {
+                return;
+            }
+            
+            // No need to load with multiple selections without multiobject support
+            if (Selection.objects.Length > 1)
+            {
+                return;
+            }
+            
+            if (!IsObjectValidTexture (Selection.activeObject))
+            {
+                return;
+            }
+            
+            FileSettings = LoadSavedFileSettingsForObject (Selection.activeObject);
+            fileSettingsLoaded = true;
+        }
+        
+        SpriteFileSettings LoadSavedFileSettingsForObject (Object obj)
+        {
+            string path = AssetDatabase.GetAssetPath(obj);
+            return SpriteSettingsUtility.GetFileSettings(path, currentSelectedSettings.SpritesheetDataFile);
+        }
+        
+        static bool IsObjectValidTexture (Object obj)
+        {
+            if (!AssetDatabase.Contains(obj))
+            {
+                return false;
+            }
+            
+            string path = AssetDatabase.GetAssetPath(obj);
+            var asset = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+            if (asset == null)
+            {
+                return false;
+            }
+            
+            return true;
         }
 
         void OnInspectorUpdate()
@@ -54,6 +107,18 @@ namespace Staple.EditorScripts
                 DrawEmptySaveSettings ();
                 return;
             }
+            
+            if (Selection.objects.Length == 0)
+            {
+                DrawNoSelection ();
+                return;
+            }
+            
+            if (!AtLeastOneTextureIsSelected ())
+            {
+                DrawSelectionNotTexture ();
+                return;
+            }
 
             EditorGUILayout.BeginVertical(EditorStyles.inspectorFullWidthMargins);
             EditorGUILayout.Space();
@@ -65,17 +130,40 @@ namespace Staple.EditorScripts
             DrawSaveSettingSelect ();
             
             EditorGUILayout.Space ();
-
-            DrawQuickSettings();
-
-            EditorGUILayout.Space();
-
+            EditorGUILayout.Space ();
             bodyScrollPos = EditorGUILayout.BeginScrollView(bodyScrollPos);
 
-            DrawSelectedTextureInfo();
+            if (!fileSettingsLoaded) {
+                LoadFileSettings ();
+            }
+            DrawFileSpecificSettings ();
 
+            EditorGUILayout.Space();
+            
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
+        }
+        
+        void DrawNoSelection ()
+        {
+            EditorGUILayout.HelpBox ("No texture is selected. Select a texture to apply saved settings.", MessageType.Warning);
+        }
+        
+        static bool AtLeastOneTextureIsSelected ()
+        {
+            foreach (var obj in Selection.objects)
+            {
+                if (IsObjectValidTexture (obj))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        void DrawSelectionNotTexture ()
+        {
+            EditorGUILayout.HelpBox ("None of the selected objects are textures. Select at least one texture" + 
+                "to apply saved settings.", MessageType.Warning);
         }
 
         void DrawApplyButton()
@@ -84,18 +172,29 @@ namespace Staple.EditorScripts
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("Apply"))
             {
-                SpriteSettingsUtility.ApplyDefaultTextureSettings(currentSelectedSettings, changePivot, changePackingTag);
-                
-				if (currentSelectedSettings.PackOnApply)
-				{
-                	UnityEditor.Sprites.Packer.RebuildAtlasCacheIfNeeded(
-                	EditorUserBuildSettings.activeBuildTarget, true);
-				}
-                
-                Close();
-                if (configWindow != null) 
+                foreach (var obj in Selection.objects)
                 {
-                    configWindow.Close ();
+                    if (IsObjectValidTexture (obj))
+                    {
+                        // Load currently set fileSettings for multi-select. Otherwise use saved fileSettings
+                        SpriteFileSettings settings = Selection.objects.Length == 1 ? 
+                            FileSettings : LoadSavedFileSettingsForObject (obj);
+                        if (!settings.SlicingOptions.IsValid ()) {
+                            Debug.LogWarning ("Skipping ApplyingTextureSettings to object due to invalid "
+                                 + "Slicing Options. Object: " + obj.name);
+                            continue;
+                        }
+                        string path = AssetDatabase.GetAssetPath (obj);
+                        var selectedTexture = AssetDatabase.LoadAssetAtPath <Texture2D> (path);
+                        SpriteSettingsUtility.ApplySpriteSettings(selectedTexture,
+                            currentSelectedSettings, settings);
+                    }
+                }
+                
+                if (currentSelectedSettings.PackOnApply)
+                {
+                    UnityEditor.Sprites.Packer.RebuildAtlasCacheIfNeeded(
+                    EditorUserBuildSettings.activeBuildTarget, true);
                 }
             }
             GUI.backgroundColor = defaultBg;
@@ -135,9 +234,9 @@ namespace Staple.EditorScripts
         
         void ShowConfigWindow (int indexToFocus)
         {
-                configWindow = EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
-                configWindow.SetConfig (config);
-                configWindow.SelectSetting (indexToFocus);
+            configWindow = EditorWindow.GetWindow<SpriteSettingsConfigWindow>("Saved SpriteSettings", true);
+            configWindow.SetConfig (config);
+            configWindow.SelectSetting (indexToFocus);
         }
         
         void DrawSaveSettingSelect ()
@@ -162,24 +261,46 @@ namespace Staple.EditorScripts
             EditorGUILayout.EndHorizontal ();
         }
 
-        void DrawQuickSettings()
+        void DrawFileSpecificSettings ()
         {
-            changePivot = EditorGUILayout.BeginToggleGroup("Apply Pivot", changePivot);
-
-            currentSelectedSettings.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(currentSelectedSettings.Pivot);
-
-            if (currentSelectedSettings.Pivot == SpriteAlignment.Custom)
-                currentSelectedSettings.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", currentSelectedSettings.CustomPivot);
-
-            EditorGUILayout.EndToggleGroup();
-
+            if (Selection.objects.Length > 1)
+            {
+                string slicingInfo = "";
+                foreach (var obj in Selection.objects)
+                {
+                    if (IsObjectValidTexture (obj))
+                    {
+                        FileSettings = LoadSavedFileSettingsForObject (obj);
+                        slicingInfo += "\n" + obj.name + ": " + FileSettings.SlicingOptions.ToDisplayString ();
+                    }
+                }
+                EditorGUILayout.HelpBox ("File Settings do not support Multiple-Object editing. "
+                    + " The following settings will be used:\n" + slicingInfo, MessageType.Info);
+                return;
+            }
+            
+            DrawSlicingOptions ();
+            
             EditorGUILayout.Space();
+            
+            EditorGUILayout.LabelField ("Override Settings", EditorStyles.boldLabel);
+            if (FileSettings.SlicingOptions.ImportMode != SpriteImportMode.None)
+            {
+                DrawPivotOverride ();
+            }
+            DrawPackingTagOverride ();
+        }
+        
+        void DrawPackingTagOverride ()
+        {
+            FileSettings.OverridePackingTag = EditorGUILayout.BeginToggleGroup("Override Packing Tag", 
+                FileSettings.OverridePackingTag);
 
-            changePackingTag = EditorGUILayout.BeginToggleGroup("Apply Packing Tag", changePackingTag);
+            var tagToUse = FileSettings.OverridePackingTag ? 
+                FileSettings.PackingTag : currentSelectedSettings.PackingTag;
+            FileSettings.PackingTag = EditorGUILayout.TextField(tagToUse);
 
-            currentSelectedSettings.PackingTag = EditorGUILayout.TextField(currentSelectedSettings.PackingTag);
-
-            if (changePackingTag)
+            if (FileSettings.OverridePackingTag)
             {
                 foreach (var name in UnityEditor.Sprites.Packer.atlasNames)
                 {
@@ -193,39 +314,51 @@ namespace Staple.EditorScripts
             
             EditorGUILayout.EndToggleGroup();
         }
-
-        void DrawSelectedTextureInfo()
+        
+        void DrawSlicingOptions ()
         {
-            if (Selection.objects.Length > 0)
+            EditorGUILayout.LabelField ("Slicing Options", EditorStyles.boldLabel);
+            
+            FileSettings.SlicingOptions.ImportMode = (SpriteImportMode) EditorGUILayout.EnumPopup 
+                ("Sprite Import Mode", FileSettings.SlicingOptions.ImportMode);
+                
+            EditorGUILayout.Space();
+            
+            if (FileSettings.SlicingOptions.ImportMode == SpriteImportMode.Multiple)
             {
-                EditorGUILayout.LabelField("Selected textures");
-                EditorGUILayout.Space();
-
-                Color defaultColor = GUI.color;
-                GUI.color = Color.yellow;
-
-                foreach (var obj in Selection.objects)
+                /*
+                // Future: Could add alternate slicing algorithms
+                FileSettings.SlicingOptions.SlicingMethod = (SpriteSlicingOptions.GridSlicingMethod) 
+                    EditorGUILayout.EnumPopup ("Grid Slicing Method", FileSettings.SlicingOptions.SlicingMethod);
+                */
+                if (FileSettings.SlicingOptions.SlicingMethod == SpriteSlicingOptions.GridSlicingMethod.Bogdan)
                 {
-                    if (!AssetDatabase.Contains(obj)) continue;
-
-                    string path = AssetDatabase.GetAssetPath(obj);
-
-                    var asset = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
-                    if (asset == null) continue;
-
-                    string metaData = "";
-
-                    var spriteSheetData = SpriteSettingsUtility.GetSpriteData(path, currentSelectedSettings.SpritesheetDataFile);
-                    if (spriteSheetData != null)
-                    {
-                        metaData = " " + spriteSheetData.Size + ", " + spriteSheetData.Frames + " frames";
-                    }
-
-                    EditorGUILayout.LabelField(path + metaData);
+                    FileSettings.SlicingOptions.Frames = EditorGUILayout.IntField ("Frames",
+                        FileSettings.SlicingOptions.Frames);
                 }
-
-                GUI.color = defaultColor;
+                
+                FileSettings.SlicingOptions.CellSize = EditorGUILayout.Vector2Field ("Cell Size (X/Y)",
+                    FileSettings.SlicingOptions.CellSize);
+                
+                EditorGUILayout.Space();
             }
+        }
+        
+        void DrawPivotOverride ()
+        {
+            FileSettings.SlicingOptions.OverridePivot = EditorGUILayout.BeginToggleGroup("Override Pivot", 
+                FileSettings.SlicingOptions.OverridePivot);
+            var pivotToUse = FileSettings.SlicingOptions.OverridePivot ? 
+                FileSettings.SlicingOptions.Pivot : currentSelectedSettings.Pivot;
+            FileSettings.SlicingOptions.Pivot = (SpriteAlignment)EditorGUILayout.EnumPopup(pivotToUse);
+
+            bool showCustomPivot = FileSettings.SlicingOptions.Pivot == SpriteAlignment.Custom;
+            EditorGUI.BeginDisabledGroup (!showCustomPivot);
+            var customPivotToUse = FileSettings.SlicingOptions.OverridePivot ? 
+                FileSettings.SlicingOptions.CustomPivot : currentSelectedSettings.CustomPivot;
+            FileSettings.SlicingOptions.CustomPivot = EditorGUILayout.Vector2Field("Custom Pivot", customPivotToUse);
+            EditorGUI.EndDisabledGroup ();
+            EditorGUILayout.EndToggleGroup();
         }
     }
 }

@@ -12,162 +12,152 @@ namespace Staple.EditorScripts
 {
     public class SpriteSettingsUtility
     {
-        public class SpriteSheetData
-        {
-            public Vector2 Size;
-            public uint Frames;
-        }
-
-        public static void ApplyDefaultTextureSettings(
-            SpriteSettings prefs,
-            bool changePivot,
-            bool changePackingTag)
+        public static void ApplySpriteSettings(Texture2D texture,
+            SpriteSettings prefs, SpriteFileSettings fileSettings)
         {
             if (prefs == null) return;
 
-            foreach (var obj in Selection.objects)
+            string path = AssetDatabase.GetAssetPath (texture);
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            
+            // When we have text file data
+            SpriteSlicingOptions slicingOptions = fileSettings.SlicingOptions;
+            if (slicingOptions.ImportMode == SpriteImportMode.Multiple)
             {
-                if (!AssetDatabase.Contains(obj)) continue;
+                // Clamp cellSize to texture width and height
+                slicingOptions.CellSize.x = Mathf.Min (texture.width, slicingOptions.CellSize.x);
+                slicingOptions.CellSize.y = Mathf.Min (texture.height, slicingOptions.CellSize.y);
+                
+                SpriteMetaData[] spriteSheet;
+                spriteSheet = SpriteSlicer.CreateSpriteSheetForTexture (AssetDatabase.LoadAssetAtPath(path,
+                    typeof(Texture2D)) as Texture2D, slicingOptions);
 
-                string path = AssetDatabase.GetAssetPath(obj);
+                // If we don't do this it won't update the new sprite meta data
+                importer.spriteImportMode = SpriteImportMode.Single;
+                importer.spriteImportMode = SpriteImportMode.Multiple;
 
-                var importer = AssetImporter.GetAtPath(path) as TextureImporter;
-                if (importer == null) continue;
-
-                // Try to slice it
-                var fileName = Path.GetFileNameWithoutExtension(path);
-                SpriteSheetData spriteSheetData = GetSpriteData(path, prefs.SpritesheetDataFile);
-				
-				// When we have text file data
-                if (spriteSheetData != null)
-                {
-                    var gridRects = InternalSpriteUtility.GenerateGridSpriteRectangles(
-                        AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D,
-                        Vector2.zero, spriteSheetData.Size, Vector2.zero);
-
-                    var spriteSheet = importer.spritesheet ?? new SpriteMetaData[gridRects.Length];
-
-                    if (importer.spritesheet != null)
-                        spriteSheet = spriteSheet.Concat(new SpriteMetaData[Mathf.Max(0, gridRects.Length - importer.spritesheet.Length)]).ToArray();
-
-                    for (var i = 0; i < spriteSheet.Length; i++)
-                    {
-						bool sliceExists = importer.spritesheet != null && i < importer.spritesheet.Length;						
-                        bool changed = changePivot || !(sliceExists);
-                        spriteSheet[i] = new SpriteMetaData
-                        {
-                            alignment = changed ? (int)prefs.Pivot : spriteSheet[i].alignment,
-                            pivot = changed ? prefs.CustomPivot : spriteSheet[i].pivot,
-                            name =  sliceExists ? spriteSheet[i].name : fileName + "_" + Array.IndexOf(gridRects, gridRects[i]),
-                            rect = gridRects[i]
-                        };
-                    }
-
-                    // If we don't do this it won't update the new sprite meta data
-                    importer.spriteImportMode = SpriteImportMode.Single;
-                    importer.spriteImportMode = SpriteImportMode.Multiple;
-
-                    if (spriteSheetData.Frames > 0)
-                        importer.spritesheet = spriteSheet.Take((int)spriteSheetData.Frames).ToArray();
-                    else
-                        importer.spritesheet = spriteSheet;
-                }
-                else if (importer.spritesheet != null && changePivot) // for existing sliced sheets without data in the text file and wantint to change pivot
-				{
-					var spriteSheet = new SpriteMetaData[importer.spritesheet.Length];
-					
-					for (int i = 0; i < importer.spritesheet.Length; i++)
-					{
-						var spriteMetaData = importer.spritesheet[i];
-						spriteMetaData.alignment = (int)prefs.Pivot;
-						spriteMetaData.pivot = prefs.CustomPivot;
-						spriteSheet[i] = spriteMetaData;
-					}
-					
-					importer.spritesheet = spriteSheet;
-				}
-				else
-                    importer.spriteImportMode = SpriteImportMode.Single;
-
-                TextureImporterSettings settings = new TextureImporterSettings();
-                importer.ReadTextureSettings(settings);
-
-                settings.filterMode = prefs.FilterMode;
-                settings.wrapMode = prefs.WrapMode;
-                settings.mipmapEnabled = prefs.GenerateMipMaps;
-                settings.textureFormat = prefs.TextureFormat;
-                settings.maxTextureSize = prefs.MaxSize;
-
-                settings.spritePixelsPerUnit = prefs.PixelsPerUnit;
-
-                settings.spriteExtrude = (uint)Mathf.Clamp(prefs.ExtrudeEdges, 0, 32);
-                settings.spriteMeshType = prefs.SpriteMeshType;
-
-                if (changePivot)
-                {
-                    settings.spriteAlignment = (int)prefs.Pivot;
-                    if (prefs.Pivot == SpriteAlignment.Custom)
-                        settings.spritePivot = prefs.CustomPivot;
-                }
-
-                if (changePackingTag)
-                    importer.spritePackingTag = prefs.PackingTag;
-
-                importer.SetTextureSettings(settings);
-#if UNITY_5_0
-                importer.SaveAndReimport();
-#else
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-#endif
-                EditorUtility.SetDirty(obj);
+                importer.spritesheet = spriteSheet;
             }
+            else if (slicingOptions.ImportMode == SpriteImportMode.Single) 
+            {
+                importer.spriteImportMode = SpriteImportMode.Single;
+            } else if (slicingOptions.ImportMode == SpriteImportMode.None)
+            {
+                // Do nothing for None mode for now.
+            } else
+            {
+                throw new System.NotSupportedException ("Encountered unsupported SpriteImportMode:" 
+                    + slicingOptions.ImportMode);
+            }
+
+            TextureImporterSettings settings = new TextureImporterSettings();
+            importer.ReadTextureSettings(settings);
+            importer.textureType = TextureImporterType.Advanced;
+
+            settings.filterMode = prefs.FilterMode;
+            settings.wrapMode = prefs.WrapMode;
+            settings.mipmapEnabled = prefs.GenerateMipMaps;
+            settings.textureFormat = prefs.TextureFormat;
+            settings.maxTextureSize = prefs.MaxSize;
+
+            settings.spritePixelsPerUnit = prefs.PixelsPerUnit;
+
+            settings.spriteExtrude = (uint)Mathf.Clamp(prefs.ExtrudeEdges, 0, 32);
+            settings.spriteMeshType = prefs.SpriteMeshType;
+            
+            // Settings also store Sprite Alignment for Single spritemode
+            settings.spriteAlignment = (int)slicingOptions.Pivot;
+            if (slicingOptions.Pivot == SpriteAlignment.Custom)
+            {
+                settings.spritePivot = slicingOptions.CustomPivot;
+            }
+
+            importer.spritePackingTag = fileSettings.PackingTag;
+
+            importer.SetTextureSettings(settings);
+#if UNITY_5_0
+            importer.SaveAndReimport();
+#else
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+#endif
+            EditorUtility.SetDirty(texture);
+            WriteSpriteFileSettings (path, prefs.SpritesheetDataFile, texture.name + ".png", fileSettings);
         }
 
 
-        public static SpriteSheetData GetSpriteData(string path, string dataFileName)
+        public static SpriteFileSettings  GetFileSettings(string path, string dataFileName)
         {
-            var spriteSheetDataFile = AssetDatabase.LoadAssetAtPath(
+            var fileSettings = AssetDatabase.LoadAssetAtPath(
                 Path.GetDirectoryName(path) + "/" + dataFileName, typeof(TextAsset)
                 ) as TextAsset;
 
-            return GetSpriteData(path, spriteSheetDataFile);
+            return GetFileSettings(path, fileSettings);
         }
 
-        public static SpriteSheetData GetSpriteData(string path, TextAsset spriteSheetDataFile)
+        public static SpriteFileSettings GetFileSettings(string path, TextAsset slicingOptionsDataFile)
         {
-            if (spriteSheetDataFile != null)
+            if (slicingOptionsDataFile != null)
             {
-                string[] entries = spriteSheetDataFile.text.Split(
+                string[] entries = slicingOptionsDataFile.text.Split(
                     new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
 
                 string entry = entries.FirstOrDefault(x => x.StartsWith(Path.GetFileName(path)));
 
                 if (!string.IsNullOrEmpty(entry))
                 {
-                    string[] entryData = entry.Split(',');
-                    var data = new SpriteSheetData();
-                    try
+                    try {
+                        // Strip filename
+                        int firstIndex = entry.IndexOf (',') + 1;
+                        int lastIndex = entry.Length - 1;
+                        var slicingData = entry.Substring (firstIndex, lastIndex - firstIndex + 1);
+                        return SpriteFileSettings.FromString (slicingData);
+                    } catch (SystemException e)
                     {
-                        float width = int.Parse(entryData[1]);
-                        float height = int.Parse(entryData[2]);
-                        data.Size = new Vector2(width, height);
-
-                        // number of frames is optional
-                        uint frames = 0;
-                        if (entryData.Length > 3)
-                            if (uint.TryParse(entryData[3], out frames))
-                                data.Frames = frames;
-
-                        return data;
-                    }
-                    catch
-                    {
-                        Debug.LogError("Invalid sprite data at line: " + Array.IndexOf(entries, entry) + ", (" + entry + ")");
+                        Debug.LogError (string.Format ("Encountered error in saved slicing options file. Entry: " + entry
+                            + "\n Error: " + e));
                     }
                 }
             }
 
-            return null;
+            return new SpriteFileSettings ();
+        }
+        static void WriteSpriteFileSettings(string path, string dataFileName, string key, SpriteFileSettings spriteFileSettings)
+        {
+            string textAssetPath = Path.GetDirectoryName(path) + "/" + dataFileName;
+            var spriteSheetDataFile = AssetDatabase.LoadAssetAtPath(textAssetPath, typeof(TextAsset)) as TextAsset;
+            
+            string newEntry = string.Concat (key, ", ", spriteFileSettings.ToString ());
+            
+            // Create new file if none exists
+            if (spriteSheetDataFile == null) 
+            {
+                File.WriteAllText (textAssetPath, newEntry);
+            } else
+            {
+                string existing = File.ReadAllText (textAssetPath);
+                if (existing.Contains (key))
+                {
+                    string[] entries = spriteSheetDataFile.text.Split(
+                        new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 0; i < entries.Length; i++)
+                    {
+                        if (entries[i].Contains(key))
+                        {
+                            entries[i] = newEntry;
+                        }
+                    }
+                    File.WriteAllLines (textAssetPath, entries);
+                } else 
+                {
+                    File.AppendAllText (textAssetPath, "\n" + newEntry);
+                }
+            }
+            
+            AssetDatabase.ImportAsset(textAssetPath, ImportAssetOptions.ForceUpdate);
+            if (spriteSheetDataFile != null)
+            {
+                EditorUtility.SetDirty(spriteSheetDataFile);
+            }
         }
     }
 }
